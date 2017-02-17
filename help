@@ -1,0 +1,23 @@
+ SYNTAX: [URL]|[Pre]|[SearchTerm] (Arg)
+
+Common:
+ [URL] = www.site.domain/stuff
+ [Pre] = [p]lay list, [r]ead list, [e]dit list, etc.
+ (Arg) = (a)dd link to playlist, (f)ind specific term in playlist, etc.
+
+One Argument:
+ [URL]		→  play [URL]
+ [p]		→  Play through active playlist
+ [r]		→  Read playlist
+ [R]		→  List all playlists
+ [e]		→  Edit playlist
+
+Two Arguments:
+ [URL] (a)		→  (a)dd [Link] to current playlist
+ [SearchTerm] (f)	→  search playlist to (f)ind given [SearchTerm]
+
+ [ListName] (p)	→  picks playlist [ListName]
+ [ListName] (P)	→  Creates playlist [ListName]
+ [ListName] (C)	→  Deletes playlist [ListName]
+
+ 'q' exits active media or list, then, 'ctrl+c' stops script
