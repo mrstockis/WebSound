@@ -1,13 +1,13 @@
-## WebSound
+# WebSound
 - Simple terminal music player, written in bash
 * this program is - as of now - dependent on `mpv`, `youtube-dl`, and the `nano` text editor
 
 
-######Features:
+#####Features:
 - streams any URL, from where youtube-dl can extract a viable media link (vimeo/youtube/soundcloud/internet radio etc.)
 - playlist management
 
-######Coming:
+#####Coming:
 * config-file
 * possibility to use any texteditor
 * alternative mediaplayers; vlc, omxplayer
@@ -15,19 +15,19 @@
 
 
 ###INSTALL
-  first install is made by running the `install.sh`, while in the cloned folder
-```
+first install is made by running the `install.sh`, while in the cloned folder  
+`cd` to `../WebSound/`, then
 cd ../WebSound/
 sudo chmod +x install.sh webSound.sh     #in case e(x)ecute rights are missing
 ./install.sh
 ```
-  a new folder `/.webSound/` will be created in the home-folder `~/`, housing all the files
-  a new alias `WebSound` will be asked to be added to `~/.bashrc`, and takes effect after next reboot
-  first Run starts automaticly, and the clone-map Can be deleted.
+a new folder `/.webSound/` will be created in the home-folder `~/`, housing all the files  
+a new alias `WebSound` will be asked to be added to `~/.bashrc`, and takes effect after next reboot  
+first Run starts automaticly, and the clone-map Can be deleted  
 
-  if clone is kept for future updates, re-run the `../WebSound/install.sh` after new git's been pulled to synchronize
+if clone is kept for future updates, re-run the `../WebSound/install.sh` after new git's been pulled to synchronize  
+`cd` to `../WebSound/`, then
 ```
-cd ../WebSound/
 git pull
 sudo chmod +x install.sh webSound.sh     #in case e(x)ecute rights are missing
 ./install.sh
