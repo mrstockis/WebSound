@@ -18,6 +18,7 @@ echo " Copied 'webSound.sh'"
 cp help ~/.webSound/help
 echo " Copied 'help'"
 echo -e "\n Done, you can now delete this whole folder\n"
-echo -e "\e[1;33m Script 'webSound.sh' is found in '~/.webSound/'\n\e[0m"
+echo -e "\e[1;33m Alias 'WebSound' was added to ~/.bashrc and will take effect next reboot
+echo -e " Script 'webSound.sh' is found in '~/.webSound/'\n\e[0m"
 echo -e "\e[1;34m  Automaticly Starts First Run\e[0m"
 ~/.webSound/./webSound.sh
