@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 N=1
 Folder=~/.webSound/
