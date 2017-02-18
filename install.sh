@@ -20,13 +20,13 @@ echo " Copied  help"
 printf "\n\033[1;33m Add alias 'WebSound' to ~/.bashrc? y/N: "
 read A
 if [[ $A == "y" ]]; then
-#printf "\nalias WebSound=~/.webSound/./webSound.sh\n" >> ~/.bashrc
+printf "\nalias WebSound=~/.webSound/./webSound.sh\n" >> ~/.bashrc
 printf "\n\033[1;33m Alias  WebSound  was added to  ~/.bashrc  and will take effect next reboot\n"
 else
-printf "\n Skipped creating alias\n"
+printf "\n Did not add alias\n"
 fi
 printf " Script  webSound.sh  is found in  ~/.webSound/ \033[0m\n"
 printf "\n Done, you can now delete this folder\n"
 
-printf "\n\033[1;34m  Automaticly Starts First Run\033[0m\n\n"
+printf "\n\033[1;34m  Automaticly Starts First Run\033[0m\n"
 ~/.webSound/./webSound.sh
