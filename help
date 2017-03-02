@@ -1,20 +1,21 @@
  SYNTAX: [URL]|[Pre]|[SearchTerm] (Arg)
 
 Common:
- [URL] = www.site.domain/stuff
- [Pre] = [p]lay list, [r]ead list, [e]dit list, etc.
- (Arg) = (a)dd link to playlist, (f)ind specific term in playlist, etc.
+ [URL] = site.domain/specificStuff
+ [Pre] = [p]lay list, [r]ead list, [e]dit list
 
 One Argument:
- [URL]		→  play [URL]
- [p]		→  Play through active playlist
- [r]		→  Read playlist
- [R]		→  List all playlists
- [e]		→  Edit playlist
+ [URL]	→  play [URL]
+
+Presets:
+ [p]	→  Play through active playlist
+ [r]	→  Read playlist
+ [R]	→  Lists all playlists
+ [e]	→  Edit playlist
 
 Two Arguments:
- [URL] (a)		→  (a)dd [Link] to current playlist
- [SearchTerm] (f)	→  search playlist to (f)ind given [SearchTerm]
+ [URL] (a)	  → (a)dd [Link] to current playlist
+ [SearchTerm] (f) → search playlist to (f)ind given [SearchTerm]
 
  [ListName] (p)	→  picks playlist [ListName]
  [ListName] (P)	→  Creates playlist [ListName]

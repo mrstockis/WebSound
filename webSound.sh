@@ -3,25 +3,29 @@
 N=1
 Folder=~/.webSound/
 H=help
-#clear
+#clear #on/off#
 
-printf "\n\033[34m          WebSound\033[0m"
+#bright|dark-yellow|red|blue|EndAll#
+declare -A c; c[E]="\033[0m"; c[d]="\033[2m"; c[D]="\033[22m"
+c[by]="\033[1;33m"; c[bb]="\033[1;34m"; c[r]="\033[31m"; c[b]="\033[34m"; c[dy]="\033[2;33m"
+
+printf "\n${c[b]}          WebSound${c[E]}"
 while true; do
-printf "\033[2m\n----------------------------------\nEnter 'h' for help .. or \033[22m command: "
+printf "${c[d]}\n----------------------------------\nEnter 'h' for help .. or ${c[D]} command: "
 read U A
 
 if [ $U ]; then if [ ! $A ]; then
 
 	if [ $U == "h" ]; then
-		printf "\e[1;33m\n$(cat $Folder$H)\e[0m\n"
+		printf "${c[by]}\n$(cat $Folder$H)${c[E]}\n"
 	elif [ $U == "p" ]; then
-		printf "\e[1;34m  Starts Playlist $N: \e[0m\n\n"
-		mpv --vid=no --quiet $(cat $Folder$N | grep -v '#')
+		printf "${c[bb]}  Starts Playlist $N: ${c[E]}\n\n"
+		mpv --vid=no --quiet $(grep -v '#' $Folder$N)
 	elif [ $U == "r" ]; then
-		(printf "\e[1;34m Playlist $N, $(cat $Folder$N | grep '#' -c) item(s)\e[0m\n" && cat $Folder$N | less) || printf "\e[31m No such playlist\e[0m\n"
+		(printf "${c[bb]} Playlist $N, $(grep '#' -c $Folder$N) item(s)${c[E]}\n" && cat $Folder$N | less) || printf "${c[r]} No such playlist${c[E]}\n"
 	elif [ $U == "R" ]; then
-		printf "\e[1;34m$(ls $Folder | egrep -iv 'websound|help')\n\n"
-		printf " Playlist $N, $(cat $Folder$N | grep '#' -c) item(s)\e[0m\n"
+		printf "${c[bb]}$(ls $Folder | egrep -iv 'websound|help')\n\n"
+		printf " Playlist $N, $(grep '#' -c $Folder$N) item(s)${c[E]}\n"
 	elif [ $U == "e" ]; then
 		nano $Folder$N
 	else
@@ -29,21 +33,21 @@ if [ $U ]; then if [ ! $A ]; then
 	fi
 
   elif [ $A == "f" ]; then
-	printf "\e[1;34m Found\n $(cat $Folder$N | grep -i $U)\e[0m\n\n"
+	printf "${c[bb]} Found\n $(grep -i $U $Folder$N)${c[E]}\n\n"
 	mpv --vid=no --quiet $(cat $Folder$N | grep -i $U)
   elif [ $A == "a" ]; then
 	printf '\n#\n' >> $Folder$N && echo $U >> $Folder$N
-	printf "\e[1;34m Added $URL to Playlist $N \e[0m\n"
+	printf "${c[bb]} Added $URL to Playlist $N ${c[E]}\n"
   elif [ $A == "p" ]; then
-	N=$U; (printf "\e[1;34m Playlist $N, $(cat $Folder$N | grep '#' -c) item(s)\e[0m\n") || printf "\e[31m No such playlist\e[0m\n"
+	N=$U; (printf "${c[bb]} Playlist $N, $(grep '#' -c $Folder$N) item(s)${c[E]}\n") || printf "${c[r]} No such playlist${c[E]}\n"
   elif [ $A == "P" ]; then
 	touch $Folder$U
-	printf "\e[1;34m Created Playlist $U \e[0m\n"
+	printf "${c[bb]} Created Playlist $U ${c[E]}\n"
   elif [ $A == "C" ]; then
-	(printf "\e[1;34m Remove Playlist $U, with $(cat $Folder$U | grep '#' -c) item(s)\n?" && printf "\e[2;33m$(cat $Folder$U) \e[0m\n" && rm -i $Folder$U) || printf "\e[31m No such playlist found\e[0m\n"
+	(printf "${c[bb]} Remove Playlist $U, with $(grep '#' -c $Folder$U) item(s)?\n" && printf "${c[dy]}$(cat $Folder$U) ${c[E]}\n" && rm -i $Folder$U) || printf "${c[r]} No such playlist found${c[E]}\n"
   fi
 
-else 	printf '\e[31m No proper command given\e[0m\n'
+else 	printf '${c[r]} No proper command given${c[E]}\n'
 
 fi
 done
