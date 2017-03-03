@@ -1,11 +1,16 @@
 #!/bin/bash
+#############################################################
+N=1			##Default playlist at start
+Folder=~/.webSound/	##Location of WebSound-folder (if need to move folder)
+#clear 			##Clear terminal at start
 
-N=1
-Folder=~/.webSound/
-H=help
-#clear #on/off#
+###Player - mpv|cvlc|omxplayer
+play="mpv --vid=no --quiet"
+#play="cvlc something something"
+#play="sudo omxplayer -o hdmi -b \$(youtube-dl -gf bestaudio"
+#############################################################
 
-#bright|dark-yellow|red|blue|EndAll#
+#Array of color#
 declare -A c; c[E]="\033[0m"; c[d]="\033[2m"; c[D]="\033[22m"
 c[by]="\033[1;33m"; c[bb]="\033[1;34m"; c[r]="\033[31m"; c[b]="\033[34m"; c[dy]="\033[2;33m"
 
@@ -17,24 +22,24 @@ read U A
 if [ $U ]; then if [ ! $A ]; then
 
 	if [ $U == "h" ]; then
-		printf "${c[by]}\n$(cat $Folder$H)${c[E]}\n"
+		printf "${c[by]}\n$(cat "$Folder"help)${c[E]}\n"
 	elif [ $U == "p" ]; then
 		printf "${c[bb]}  Starts Playlist $N: ${c[E]}\n\n"
-		mpv --vid=no --quiet $(grep -v '#' $Folder$N)
+		$play $(grep -v '#' $Folder$N)
 	elif [ $U == "r" ]; then
-		(printf "${c[bb]} Playlist $N, $(grep '#' -c $Folder$N) item(s)${c[E]}\n" && cat $Folder$N | less) || printf "${c[r]} No such playlist${c[E]}\n"
+		(printf "${c[bb]} Playlist $N, $(grep '#' -c $Folder$N) item(s)${c[E]}\n" && cat $Folder$N) || printf "${c[r]} No such playlist${c[E]}\n"
 	elif [ $U == "R" ]; then
 		printf "${c[bb]}$(ls $Folder | egrep -iv 'websound|help')\n\n"
 		printf " Playlist $N, $(grep '#' -c $Folder$N) item(s)${c[E]}\n"
 	elif [ $U == "e" ]; then
 		nano $Folder$N
 	else
-		mpv --vid=no --quiet $U
+		$play $U
 	fi
 
   elif [ $A == "f" ]; then
 	printf "${c[bb]} Found\n $(grep -i $U $Folder$N)${c[E]}\n\n"
-	mpv --vid=no --quiet $(cat $Folder$N | grep -i $U)
+	$play $(grep -i $U $Folder$N)
   elif [ $A == "a" ]; then
 	printf '\n#\n' >> $Folder$N && echo $U >> $Folder$N
 	printf "${c[bb]} Added $URL to Playlist $N ${c[E]}\n"
