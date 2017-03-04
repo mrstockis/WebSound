@@ -28,4 +28,4 @@ printf "\n Script: webSound.sh  -and everything else-  is found in: ~/.webSound/
 printf "\n Done, you can now delete This folder\n"
 
 printf "\n\033[1;34m  Automatically Starts First Run\033[0m\n"
-~/.webSound/./webSound.sh
+bash ~/.webSound/webSound.sh

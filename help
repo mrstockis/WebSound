@@ -1,8 +1,8 @@
  SYNTAX: [URL]|[Pre]|[SearchTerm] (Arg)
 
 Common:
- [URL] = site.domain/specificStuff
- [Pre] = [p]lay list, [r]ead list, [e]dit list
+ [URL] = www.site.domain/specific/stuff
+ [p|r|e] = [p]lay, [r]ead or [e]dit current list
 
 One Argument:
  [URL]	→  play [URL]
@@ -16,9 +16,8 @@ Presets:
 Two Arguments:
  [URL] (a)	  → (a)dd [Link] to current playlist
  [SearchTerm] (f) → search playlist to (f)ind given [SearchTerm]
-
- [ListName] (p)	→  picks playlist [ListName]
+ [ListName] (p)	→  Picks playlist [ListName]
  [ListName] (P)	→  Creates playlist [ListName]
- [ListName] (C)	→  Deletes playlist [ListName]
+ [ListName] (K)	→  Deletes playlist [ListName]
 
- 'q' exits active media or list, then, 'ctrl+c' stops script
+ <q> exits active media, <ctrl+c> stops script

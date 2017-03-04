@@ -38,8 +38,8 @@ if [ $U ]; then if [ ! $A ]; then
 	fi
 
   elif [ $A == "f" ]; then
-	printf "${c[bb]} Found\n $(grep -i $U $Folder$N)${c[E]}\n\n"
-	$play $(grep -i $U $Folder$N)
+	printf "${c[bb]} Found\n$(egrep -iv '#' $Folder$N | grep -i $U)${c[E]}\n\n"
+	$play $(egrep -iv '#' $Folder$N | grep -i $U)
   elif [ $A == "a" ]; then
 	printf '\n#\n' >> $Folder$N && echo $U >> $Folder$N
 	printf "${c[bb]} Added $URL to Playlist $N ${c[E]}\n"
@@ -48,11 +48,11 @@ if [ $U ]; then if [ ! $A ]; then
   elif [ $A == "P" ]; then
 	touch $Folder$U
 	printf "${c[bb]} Created Playlist $U ${c[E]}\n"
-  elif [ $A == "C" ]; then
+  elif [ $A == "K" ]; then
 	(printf "${c[bb]} Remove Playlist $U, with $(grep '#' -c $Folder$U) item(s)?\n" && printf "${c[dy]}$(cat $Folder$U) ${c[E]}\n" && rm -i $Folder$U) || printf "${c[r]} No such playlist found${c[E]}\n"
   fi
 
-else 	printf '${c[r]} No proper command given${c[E]}\n'
+else 	printf "${c[r]} No proper command given${c[E]}\n"
 
 fi
 done
