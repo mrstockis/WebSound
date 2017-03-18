@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-printf "\n\033[1m First installation  or  Update ? \n f/u: "
+printf "\n\033[1;34m First installation  or  Update ? \n f/u: "
 read I
 if [[ $I ]]; then if [[ $I == "f" ]]; then
 printf "\n\033[32m -- First Installation --\033[0m\n"
@@ -18,26 +18,25 @@ cp webSound.sh ~/.webSound/
 echo " Copied: webSound.sh"
 cp help ~/.webSound/
 echo " Copied: help"
-printf "\n\033[1;33m Add alias: WebSound  to: ~/.bashrc  ? \n y/N: "
+printf "\n\033[1;34m Add alias: WebSound  to: ~/.bashrc  ? \n y/N: "
 read A
 if [[ $A == "y" ]]; then
 printf "\nalias WebSound=~/.webSound/./webSound.sh\n" >> ~/.bashrc
-printf "\033[1;33m Alias will take effect after next reboot\n"
+printf "\n\033[1;0m Alias will take effect after next reboot\n"
 else
-printf " Did not add alias\n"
+printf "\n\033[1;0m Did not add alias\n"
 fi
-printf "\n Script: webSound.sh  -and everything else-  is found in: ~/.webSound/\033[0m\n"
-printf "\n Done, you can now delete This folder\n"
-printf "\n\033[1;34m  Automatically Starts First Run\033[0m\n"
+printf "\n Script: webSound.sh  -and everything else-  is found in: ~/.webSound/\n"
+printf "\n\033[1;32m  Automatically Starts First Run\033[0m\n"
 bash ~/.webSound/webSound.sh
 
 elif [[ $I == "u" ]]; then
-printf "\n\033[1;34m -- Update --\033[0m\n"
+printf "\n\033[1;32m -- Update --\033[0m\n"
 cp webSound.sh ~/.webSound/
 printf "\n Updated: webSound.sh\n"
 cp help ~/.webSound/
 printf " Updated: help\n"
-printf "\n Done\n\n"
+printf "\n\033[1;34m Done\n\n\033[0m"
 
 else
 printf "\n Input not recognized. Enter 'f' for First intallation, or 'u' for Update.\n\n Exits.. \n\n"
