@@ -7,7 +7,6 @@ Folder=~/.webSound/	##Location of WebSound-folder (if need to move folder)
 ###Player - mpv|cvlc|omxplayer
 play="mpv --vid=no --quiet"
 #play="cvlc something something"
-#play="sudo omxplayer -o hdmi -b \$(youtube-dl -gf bestaudio"
 #############################################################
 
 #Array of color#
@@ -16,35 +15,36 @@ c[by]="\033[1;33m"; c[bb]="\033[1;34m"; c[r]="\033[31m"; c[b]="\033[34m"; c[dy]=
 
 printf "\n${c[b]}          WebSound${c[E]}"
 while true; do
-printf "${c[d]}\n----------------------------------\nEnter 'h' for help .. or ${c[D]} command: "
+printf "${c[d]}\n  Playlist $N: $(grep '#' -c $Folder$N) item(s)\n----------------------------------\nEnter 'h' for help .. or ${c[D]} command: "
 read U A
 
-if [ $U ]; then if [ ! $A ]; then case $U in
+if [ $U ]; then clear; printf "${c[d]}----------------------------------${c[E]}\n\n"; if [ ! $A ]; then case $U in
 		h)
-		printf "${c[by]}\n$(cat "$Folder"help)${c[E]}\n"  ;;
+		printf "${c[by]}$(cat "$Folder"help)${c[E]}\n"  ;;
 		p)
 		printf "${c[bb]}  Starts Playlist $N: ${c[E]}\n\n"
-		$play $(grep -v '#' $Folder$N) 2> /dev/null  ;;
+		$play $(grep -v '#' $Folder$N) 2>/dev/null  ;;
 		r)
-		(printf "${c[bb]} Playlist $N, $(grep '#' -c $Folder$N) item(s)${c[E]}\n" && cat $Folder$N) || printf "${c[r]} No such playlist${c[E]}\n"  ;;
+		cat $Folder$N 2>/dev/null || printf "${c[r]} No such playlist${c[E]}\n"  ;;
 		R)
-		printf "${c[bb]}$(ls $Folder | egrep -iv 'websound|help')\n\n"
-		printf " Playlist $N, $(grep '#' -c $Folder$N) item(s)${c[E]}\n"  ;;
+		printf "${c[bb]} Playlist	Items\n${c[E]}"
+		for i in $(ls $Folder | egrep -iv 'websound|help'); do
+		printf "${c[b]} $i		$(grep '#' -c $Folder$i)${c[E]}\n"; done  ;;
 		e)
 		nano $Folder$N  ;;
 		*)
-		$play $U 2> /dev/null  ;;
+		$play $U 2>/dev/null
 	esac
 
   elif [ $A ]; then case $A in
 	f)
 	printf "${c[bb]} Found\n$(egrep -iv '#' $Folder$N | grep -i $U)${c[E]}\n\n"
-	$play $(egrep -iv '#' $Folder$N | grep -i $U) 2> /dev/null  ;;
+	$play $(egrep -iv '#' $Folder$N | grep -i $U) 2>/dev/null  ;;
 	a)
-	printf '\n#\n' >> $Folder$N && echo $U >> $Folder$N
-	printf "${c[bb]} Added $URL to Playlist $N ${c[E]}\n"  ;;
+	printf "#\n$U\n\n" >> $Folder$N
+	printf "${c[bb]} Added:  $U\n To:  $N ${c[E]}\n${c[E]}"  ;;
 	p)
-	N=$U; (printf "${c[bb]} Playlist $N, $(grep '#' -c $Folder$N) item(s)${c[E]}\n") || printf "${c[r]} No such playlist${c[E]}\n"  ;;
+	N=$U ;;
 	P)
 	touch $Folder$U
 	printf "${c[bb]} Created Playlist $U ${c[E]}\n"  ;;
@@ -53,7 +53,7 @@ if [ $U ]; then if [ ! $A ]; then case $U in
 	esac
   fi
 
-else 	printf "${c[r]} No proper command given${c[E]}\n"
+else 	printf "${c[r]}\n No proper command given${c[E]}\n"
 
 fi
 done
