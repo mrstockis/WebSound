@@ -3,10 +3,8 @@
 N=1			##Default playlist at start
 Folder=~/.webSound/	##Location of WebSound-folder (if need to move folder)
 #clear 			##Clear terminal at start
-
-###Player - mpv|cvlc|omxplayer
 play="mpv --vid=no --quiet"
-#play="cvlc something something"
+#play="cvlc some stuff"
 #############################################################
 
 #Array of color#
@@ -35,26 +33,24 @@ if [ $U ]; then clear; printf "${c[d]}----------------------------------${c[E]}\
 		*)
 		$play $U 2>/dev/null
 	esac
-
   elif [ $A ]; then case $A in
 	f)
 	printf "${c[bb]} Found\n$(egrep -iv '#' $Folder$N | grep -i $U)${c[E]}\n\n"
 	$play $(egrep -iv '#' $Folder$N | grep -i $U) 2>/dev/null  ;;
 	a)
-	printf "#\n$U\n\n" >> $Folder$N
-	printf "${c[bb]} Added:  $U\n To:  $N ${c[E]}\n${c[E]}"  ;;
+	E=$(printf "$(youtube-dl -e $U)\n" | head -n 1)
+	printf "\n#$E\n$U\n" >> $Folder$N
+	printf "${c[bb]} Added:  $E\n To:  $N ${c[E]}\n${c[E]}"  ;;
 	p)
 	N=$U ;;
 	P)
 	touch $Folder$U
 	printf "${c[bb]} Created Playlist $U ${c[E]}\n"  ;;
 	K)
-	(printf "${c[bb]} Remove Playlist $U, with $(grep '#' -c $Folder$U) item(s)?\n" && printf "${c[dy]}$(cat $Folder$U) ${c[E]}\n" && rm -i $Folder$U) || printf "${c[r]} No such playlist found${c[E]}\n"  ;;
+	printf "${c[bb]} Remove Playlist $U, with $(grep '#' -c $Folder$U) item(s)?\n" && printf "${c[dy]}$(cat $Folder$U) ${c[E]}\n" && rm -i $Folder$U  ;;
 	esac
   fi
-
 else 	printf "${c[r]}\n No proper command given${c[E]}\n"
-
 fi
 done
 
