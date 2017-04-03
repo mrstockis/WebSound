@@ -1,23 +1,16 @@
- SYNTAX: [URL]|[Pre]|[SearchTerm] (Arg)
+ SYNTAX: [URL]|[p|r|l|e]|[SomeTerm] (Option)
 
-Common:
- [URL] = www.site.domain/specific/stuff
- [p|r|e] = [p]lay, [r]ead or [e]dit current list
+ [URL] = www.site.domain/specific/stuff →  play [URL]
 
-One Argument:
- [URL]	→  play [URL]
-
-Presets:
  [p]	→  Play through active playlist
- [r]	→  Read playlist
- [R]	→  Lists all playlists
+ [r]	→  Read current playlist
+ [l]	→  List all playlists
  [e]	→  Edit playlist
 
-Two Arguments:
- [URL] (a)	  → (a)dd [Link] to current playlist
+ [URL] (a)	  → (a)dd [URL] to current playlist
  [SearchTerm] (f) → search playlist to (f)ind given [SearchTerm]
- [ListName] (p)	→  Picks playlist [ListName]
- [ListName] (P)	→  Creates playlist [ListName]
- [ListName] (K)	→  Deletes playlist [ListName]
+ [ListName] (p)	→  picks playlist [ListName]
+ [ListName] (P)	→  creates playlist [ListName]
+ [ListName] (K)	→  deletes playlist [ListName]
 
  <q> exits active media, <ctrl+c> stops script
