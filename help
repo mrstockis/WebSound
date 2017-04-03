@@ -8,9 +8,9 @@
  [e]	→  Edit playlist
 
  [URL] (a)	  → (a)dd [URL] to current playlist
- [SearchTerm] (f) → search playlist to (f)ind given [SearchTerm]
- [ListName] (p)	→  picks playlist [ListName]
- [ListName] (P)	→  creates playlist [ListName]
- [ListName] (K)	→  deletes playlist [ListName]
+ [SearchTerm] (f) → (f)ind [SearchTerm] in playlist
+ [ListName] (p)	→  choose playlist [ListName]
+ [ListName] (P)	→  create playlist [ListName]
+ [ListName] (K)	→  delete playlist [ListName]
 
  <q> exits active media, <ctrl+c> stops script
