@@ -20,7 +20,7 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		printf "${c[bb]} Starts Playlist $N: ${c[E]}\n\n"
 		$play $(grep -v '#' $Folder$N) 2>/dev/null  ;;
 		r)
-		cat $Folder$N 2>/dev/null || printf "${c[r]} No such playlist${c[E]}\n"  ;;
+		cat $Folder$N 2>/dev/null || printf "${c[r]} No such playlist${c[E]}\n" ;;
 		l)
 		printf "${c[bb]} Playlist	Items\n${c[E]}"
 		for i in $(ls $Folder | egrep -iv 'websound|help'); do
@@ -32,8 +32,9 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		esac
 	elif [ $A ]; then case $A in
 		f)
-		printf "${c[bb]} Found\n$(egrep -iv '#' $Folder$N | grep -i $U)${c[E]}\n\n"
-		$play $(egrep -iv '#' $Folder$N | grep -i $U) 2>/dev/null  ;;
+		f=(); f+=($(egrep -iA 1 $U $Folder$N | egrep -v '#'))
+		printf "${c[bb]} Found\n$(grep '#' $Folder$N | grep -i $U)${c[E]}\n\n"
+		$play ${f[@]} 2>/dev/null ;;
 		a)
 		E=$(printf "$(youtube-dl -e $U)\n" | head -n 1)
 		printf "\n#$E\n$U\n" >> $Folder$N
@@ -49,6 +50,6 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		printf "${c[d]}${c[r]} No proper command given${c[E]}\n"  ;;
 		esac
 	fi
-else	cat "$Folder"help | less
+else printf "> Help <\n"; cat "$Folder"help | less
 fi
 done
