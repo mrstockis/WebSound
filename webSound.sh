@@ -3,7 +3,7 @@
 N=1			##Default playlist at start
 Folder=~/.webSound/	##Location of WebSound-folder
 #clear 			##Clear terminal at start
-play="mpv --vid=no --quiet" #"--load-unsafe-playlists"	#LUP-flag fixes mpv refusing playback of playlist
+play="mpv --vid=no --quiet" #"--load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
 #play="cvlc some stuff"
 #############################################################
 

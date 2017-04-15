@@ -29,3 +29,4 @@ If clone is kept for future updates, re-run the `../clone_folder/install.sh` aft
 git pull  
 bash install.sh
 ```
+test commit
