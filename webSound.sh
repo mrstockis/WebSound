@@ -31,7 +31,7 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		$play $U 2>/dev/null
 		esac
 	elif [ $A ]; then case $A in
-		f)
+		p)
 		f=(); f+=($(egrep -iA 1 $U $Folder$N | egrep -v '#'))
 		printf "${c[bb]} Found\n$(grep '#' $Folder$N | grep -i $U)${c[E]}\n\n"
 		$play ${f[@]} 2>/dev/null ;;
@@ -39,9 +39,9 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		E=$(printf "$(youtube-dl -e $U)\n" | head -n 1)
 		printf "\n#$E\n$U\n" >> $Folder$N
 		printf "${c[bb]} Added:  $E\n To:  $N ${c[E]}\n${c[E]}"  ;;
-		p)
+		l)
 		N=$U ;;
-		P)
+		L)
 		touch $Folder$U
 		printf "${c[bb]} Created Playlist $U ${c[E]}\n"  ;;
 		K)
