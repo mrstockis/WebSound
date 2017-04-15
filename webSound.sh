@@ -33,7 +33,7 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 	elif [ $A ]; then case $A in
 		p)
 		f=(); f+=($(egrep -iA 1 $U $Folder$N | egrep -v '#'))
-		printf "${c[bb]} Found\n$(grep '#' $Folder$N | grep -i $U)${c[E]}\n\n"
+		printf "${c[bb]} $(grep '#' $Folder$N | grep -i $U)${c[E]}\n\n"
 		$play ${f[@]} 2>/dev/null ;;
 		a)
 		E=$(printf "$(youtube-dl -e $U)\n" | head -n 1)

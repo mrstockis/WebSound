@@ -2,17 +2,9 @@
 - Simple terminal music player, written in bash
 * this program is - as of now - dependent on `mpv`, `youtube-dl`, and the `nano` text editor
 
-
 ####Features:
 - streams any URL, from where youtube-dl can extract a viable media link (youtube/soundcloud/internet radio etc.)
 - playlist management
-
-####Coming:
-* config-file
-* possibility to use any text editor
-* alternative mediaplayers; cvlc, omxplayer
-* youtube-dl updater for UNIX-systems  
-
 
 ###INSTALL
 First `cd to/the/cloned_folder/`, then run the `install.sh`
@@ -29,4 +21,3 @@ If clone is kept for future updates, re-run the `../clone_folder/install.sh` aft
 git pull  
 bash install.sh
 ```
-test commit
