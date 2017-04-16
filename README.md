@@ -15,6 +15,7 @@ A new folder `.webSound/` will be created in the home-folder `~/` housing all th
 A new alias `WebSound` will be asked to be added to `~/.bashrc` which takes effect after next reboot.  
 First Run starts automatically, and the clone-map Can be deleted.  
 
+#### Update
 If clone is kept for future updates, re-run the `../clone_folder/install.sh` after new git's been pulled to synchronize.  
 Go to clone `cd to/the/cloned_folder/`  
 then
