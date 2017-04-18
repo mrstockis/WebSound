@@ -1,8 +1,9 @@
 #!/bin/bash
 #############################################################
 N=1			##Default playlist at start
-Folder=~/.webSound/	##Location of WebSound-folder
+Folder=~/.webSound/	##Location of webSound.sh
 #clear 			##Clear terminal at start
+editor="nano"
 play="mpv --vid=no --quiet" #"--load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
 #play="cvlc some stuff"
 #############################################################
@@ -26,10 +27,10 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		for i in $(ls $Folder | egrep -iv 'websound|help'); do
 		printf " $i		$(grep '#' -c $Folder$i)\n"; done  ;;
 		e)
-		nano $Folder$N  ;;
+		$editor $Folder$N  ;;
 		*)
-		E=$(youtube-dl --flat-playlist -e $U); printf "${c[bb]}"
-		if [ ! "$E" ]; then echo " Playlist"; else echo " $E"; fi
+		E=$(youtube-dl --flat-playlist -e $U 2>/dev/null); printf "${c[bb]}"
+		if [ ! "$E" ]; then echo " Play"; else echo " $E"; fi
 		printf "${c[E]}\n"; $play $U 2>/dev/null  ;;
 		esac
 	elif [ $A ]; then case $A in
@@ -52,7 +53,8 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		touch $Folder$U
 		printf "${c[bb]} Created Playlist $U ${c[E]}\n"  ;;
 		K)
-		printf "${c[bb]} Remove Playlist $U, with $(grep '#' -c $Folder$U) item(s)?\n" && printf "${c[dy]}$(cat $Folder$U) ${c[E]}\n" && rm -i $Folder$U  ;;
+		printf "${c[bb]} Remove Playlist $U, with $(grep '#' -c $Folder$U) item(s)?\n"
+		printf "${c[dy]}$(cat $Folder$U) ${c[E]}\n" && rm -i $Folder$U  ;;
 		*)
 		printf "${c[d]}${c[r]} No proper command given${c[E]}\n"  ;;
 		esac
