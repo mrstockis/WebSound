@@ -14,6 +14,3 @@
  [ListName] (K)	→  delete playlist [ListName]
 
  <q> exits active media, <ctrl+c> stops script
-
-
-Ysearch "Quoted searchterm" NumberOfHits '
