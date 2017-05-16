@@ -1,12 +1,14 @@
 ## WebSound
 - Simple terminal music player, written in bash
-* this is a hobby-project to learn about bash
+* this is a hobby-project to learn about linux and the bash language
 * the program is - as of now - dependent on `mpv`\*, `youtube-dl`, `w3m` and the `nano`\* text editor  
 	\*can be changed
 
 #### Features:
-- streams any URL, from where youtube-dl can extract a viable media link (youtube/soundcloud/internet radio etc.)
-- playlist management
+- streams audio from URL containing media (youtube/soundcloud/internet-radio etc.)
+- playlist management create/add/edit
+- youtube search/play/add
+- small config-section within webSound.sh to more easily adjust some parameters
 
 #### INSTALL
 First `cd to/the/cloned_folder/` then run the `install.sh`
