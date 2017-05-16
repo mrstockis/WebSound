@@ -1,6 +1,8 @@
 ## WebSound
 - Simple terminal music player, written in bash
-* this program is - as of now - dependent on `mpv`, `youtube-dl`, and the `nano` text editor
+* this is a hobby-project to learn about bash
+* the program is - as of now - dependent on `mpv`*, `youtube-dl`, `w3m` and the `nano`* text editor, for full use  
+	*can be changed  
 
 #### Features:
 - streams any URL, from where youtube-dl can extract a viable media link (youtube/soundcloud/internet radio etc.)
