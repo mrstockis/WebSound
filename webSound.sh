@@ -14,28 +14,46 @@ c[by]="\033[1;33m"; c[bb]="\033[1;34m"; c[r]="\033[31m"; c[b]="\033[34m"; c[dy]=
 c[dot]="---------------------------"; c[ws]=" w e b s o u n d"
 printf "${c[b]}${c[ws]}${c[E]}\n"
 
-function Ysearch() {
-if [[ $2 ]]; then                                                                        
-function L() {
-v=$(echo $(("$1"-1)))
-mpv --video=no --really-quiet ${link["$v"]}
+function A() {
+E=$(printf "$(youtube-dl --flat-playlist -e "$1")\n" | head -n 1)
+if [ ! "$E" ]; then E="Playlist?"; fi
+printf "\n#$E\n"$1"\n" >> $Folder$N
+printf "${c[b]} Added:  $E\n    To:  $N ${c[E]}\n"
 }
-printf "Searches.."; link=()
-for i in $(youtube-dl -gf bestaudio ytsearch"$2":"$1"); do
-link+=("$i ")
+
+function Y() {
+read -rep 'Search: ' s
+S="$(echo "$s" | cut -f1- -d" " --output-delimiter="+")"
+w3m -dump -o display_link_number=1 https://www.youtube.com/results?search_query="$S" |
+grep "Play now" -A 2 |
+grep "\[" |
+sed 's/[ \t]*//' |
+head -n "$YT"
+ while true; do
+read -rep 'Play or (a)dd by number: ' P A
+if [ ! "$P" ]; then echo " <exits>"; break
+elif [ ! "$A" ]; then
+mpv --vid=no --really-quiet $(
+w3m -dump -o display_link_number=1 https://www.youtube.com/results?search_query="$S" |
+grep "References:" -A 200 | 
+grep "\["$P"\]" |
+awk '{print $2}')
+elif [ "$A" == "a" ]; then 
+A "$(
+w3m -dump -o display_link_number=1 https://www.youtube.com/results?search_query="$S" |
+grep "References:" -A 200 | 
+grep "\["$P"\]" |
+awk '{print $2}')"
+else printf " [Number]	→ play choice\n [Number] a	→ add choice\n [empty]	→ exit\n"
+fi
 done
-echo "Generates Selection.."
-select t in $(youtube-dl -e ytsearch"$2":"$1" | cut -f1- -d" " --output-delimiter="_"); do
-        if [ $REPLY -le $2 ]; then
-                L "$REPLY"
-        else echo "Pick 1 - $2"; fi
-done; fi 
 }
 
 while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 	read -rep "> " U A
 	history -s "$U"
 	if [ $U ]; then clear; printf "${c[d]}${c[b]}${c[ws]}${c[E]}\n\n"; if [ ! $A ]; then case $U in
+		y) Y  ;;
 		p)
 		printf "${c[b]} Starts Playlist $N: ${c[E]}\n\n"
 		$play $(grep -v '#' $Folder$N) 2>/dev/null  ;;
@@ -61,15 +79,10 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		f=(); f+=($(grep -iA 1 $U $Folder$N | egrep -v '#'))
 		printf "${c[b]}$(grep -i $U $Folder$N)${c[E]}\n\n"
 		$play ${f[@]} 2>/dev/null; fi  ;;
-		y)
-		Ysearch "$U" "$YT"  ;;
 		a)
-		E=$(printf "$(youtube-dl --flat-playlist -e $U)\n" | head -n 1)
-		if [ ! "$E" ]; then E="Playlist?"; fi
-		printf "\n#$E\n$U\n" >> $Folder$N
-		printf "${c[b]} Added:  $E\n    To:  $N ${c[E]}\n"  ;;
+		A "$U"  ;;
 		l)
-		N=$U ;;
+		N=$U  ;;
 		L)
 		touch $Folder$U
 		printf "${c[b]} Created Playlist $U ${c[E]}\n"  ;;

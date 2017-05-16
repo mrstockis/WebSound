@@ -1,6 +1,7 @@
- SYNTAX: [URL]|[p|r|l|e]|[SearchTerm] (Option)
+ SYNTAX: [URL|y|p|r|l|e|SearchTerm] (Option)
 
- [URL]	→  play [URL]
+ [URL]	→  Play [URL]
+ [y]	→  Search youtube
  [p]	→  Play through active playlist
  [r]	→  Read current playlist
  [l]	→  List all playlists
@@ -8,12 +9,8 @@
 
  [URL] (a)	  → (a)dd [URL] to current playlist
  [SearchTerm] (p) → (p)lay [SearchTerm] from playlist
- [SearchTerm] (y) → search [Search_Term] on (y)outube
  [ListName] (l)	→  choose playlist [ListName]
  [ListName] (L)	→  create playlist [ListName]
  [ListName] (K)	→  delete playlist [ListName]
 
  <q> exits active media, <ctrl+c> stops script
-
-
-Ysearch "Quoted searchterm" NumberOfHits '
