@@ -6,6 +6,7 @@ Folder=~/.webSound/	##Location of webSound.sh
 YT=5			##Number of hits from youtube search
 editor="nano"
 play="mpv --vid=no --quiet" #"--load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
+#play="omxplayer" #for i in (specifyCommands); do $play $i; done
 #play="cvlc some stuff"
 #############################################################
 
@@ -22,7 +23,10 @@ printf "${c[b]} Added:  $E\n    To:  $N ${c[E]}\n"
 }
 
 function Y() {
-read -rep 'Search: ' s
+while true; do
+read -rep ' Search: ' s
+if [ ! "$s" ]; then echo ' exits'; break
+else
 S="$(echo "$s" | cut -f1- -d" " --output-delimiter="+")"
 w3m -dump -o display_link_number=1 https://www.youtube.com/results?search_query="$S" |
 grep "Play now" -A 2 |
@@ -30,8 +34,8 @@ grep "\[" |
 sed 's/[ \t]*//' |
 head -n "$YT"
  while true; do
-read -rep 'Play or (a)dd by number: ' P A
-if [ ! "$P" ]; then echo " <exits>"; break
+read -rep ' Play or (a)dd by number: ' P A
+if [ ! "$P" ]; then break
 elif [ ! "$A" ]; then
 mpv --vid=no --really-quiet $(
 w3m -dump -o display_link_number=1 https://www.youtube.com/results?search_query="$S" |
@@ -45,8 +49,7 @@ grep "References:" -A 200 |
 grep "\["$P"\]" |
 awk '{print $2}')"
 else printf " [Number]	→ play choice\n [Number] a	→ add choice\n [empty]	→ exit\n"
-fi
-done
+fi; done; fi; done
 }
 
 while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
