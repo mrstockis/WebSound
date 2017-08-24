@@ -27,7 +27,7 @@ else
 printf "\n\033[1;0m Did not add alias\n"
 fi
 printf "\n Script: webSound.sh  -and everything else-  is found in: ~/.webSound/\n"
-printf "\n\033[1;32m  Automatically Starts First Run\033[0m\n\n"
+printf "\n\033[1;32m  Automatically Starts First Run\033[0m\n  Enter "h" for examples on usage\n\n"
 bash ~/.webSound/webSound.sh
 
 elif [[ $I == "u" ]]; then

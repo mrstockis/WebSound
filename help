@@ -1,5 +1,7 @@
  SYNTAX: [URL|y|p|r|l|e|SearchTerm] (Option)
 
+ [h]	→  This help
+
  [URL]	→  Play [URL]
  [y]	→  Search youtube
  [p]	→  Play through active playlist

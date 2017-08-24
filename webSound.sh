@@ -3,9 +3,9 @@
 N=1			##Default playlist at start
 Folder=~/.webSound/	##Location of webSound.sh
 #clear			##Clear terminal at start
-YT=5			##Number of hits from youtube search
+YT=10			##Number of hits from youtube search
 editor="nano"
-play="mpv --vid=no --quiet" #"--load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
+play="mpv --vid=no --really-quiet" #"--load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
 #play="omxplayer" #for i in (specifyCommands); do $play $i; done
 #play="cvlc some stuff"
 #############################################################
@@ -56,12 +56,14 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 	read -rep "> " U A
 	history -s "$U"
 	if [ $U ]; then clear; printf "${c[d]}${c[b]}${c[ws]}${c[E]}\n\n"; if [ ! $A ]; then case $U in
+		h) cat "$Folder"help | less; clear; printf "${c[d]}${c[b]}${c[ws]}${c[E]}\n" ;;
 		y) Y  ;;
 		p)
-		printf "${c[b]} Starts Playlist $N: ${c[E]}\n\n"
+		printf "${c[b]} Starts Playlist $N: ${c[E]}\n"
+		printf "${c[b]}$(grep '#' $Folder$N | cut -d"#" -f1-)${c[E]}\n"
 		$play $(grep -v '#' $Folder$N) 2>/dev/null  ;;
 		r)
-		cat $Folder$N 2>/dev/null | less || printf "${c[r]} No such playlist${c[E]}\n" ;;
+		cat $Folder$N 2>/dev/null | less; clear; printf "${c[d]}${c[b]}${c[ws]}${c[E]}\n" ;;
 		l)
 		printf "${c[b]} Playlist	Items\n${c[E]}"
 		for i in $(ls $Folder | egrep -iv 'websound|help'); do
@@ -87,7 +89,7 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		l)
 		N=$U  ;;
 		L)
-		touch $Folder$U
+		touch $Folder$U; N=$U
 		printf "${c[b]} Created Playlist $U ${c[E]}\n"  ;;
 		K)
 		printf "${c[b]} Remove Playlist $U, with $(grep '#' -c $Folder$U) item(s)?\n"
@@ -96,6 +98,6 @@ while printf "${c[d]}\n $N{$(grep '#' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		printf "${c[d]}${c[r]} No proper command given${c[E]}\n"  ;;
 		esac
 	fi
-else printf "> Help <\n"; cat "$Folder"help | less
+else clear; printf "${c[d]}${c[b]}${c[ws]}${c[E]}\n"
 fi
 done
