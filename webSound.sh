@@ -3,7 +3,7 @@
 N=1			##Default playlist at start
 Folder=~/.webSound/	##Location of webSound.sh
 #clear			##Clear terminal at start
-YT=10			##Number of hits from youtube search
+YT=8			##Number of hits from youtube search
 editor="nano"
 play="mpv --vid=no --really-quiet" #"--load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
 #play="omxplayer" #for i in (specifyCommands); do $play $i; done

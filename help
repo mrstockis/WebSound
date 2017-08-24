@@ -16,3 +16,6 @@
  [ListName] (K)	→  delete playlist [ListName]
 
  <q> exits active media, <ctrl+c> stops script
+
+ Some preferences(player,editor,etc.) can be made 
+ by editing top-section of the script '.webSound.sh'
