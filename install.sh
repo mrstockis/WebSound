@@ -9,9 +9,9 @@ mkdir ~/.webSound/
 touch ~/.webSound/1
 
 ## adds three items to playlist 1
-printf "\n#Soundcloud\nhttps://soundcloud.com/themidnightofficial/vampires\n" >> ~/.webSound/1
-printf "\n#Youtube\nhttps://www.youtube.com/watch?v=fWRISvgAygU\n" >> ~/.webSound/1
-printf "\n#Radio\nhttp://109.123.116.202:8010/stream\n" >> ~/.webSound/1
+printf "\n|Soundcloud\nhttps://soundcloud.com/themidnightofficial/vampires\n" >> ~/.webSound/1
+printf "\n|Youtube\nhttps://www.youtube.com/watch?v=fWRISvgAygU\n" >> ~/.webSound/1
+printf "\n|Radio\nhttp://109.123.116.202:8010/stream\n" >> ~/.webSound/1
 
 cp webSound.sh ~/.webSound/
 cp help ~/.webSound/
