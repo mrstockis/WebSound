@@ -5,8 +5,7 @@ Folder=~/.webSound/	##Location of webSound.sh
 #clear			##Clear terminal at start
 YT=8			##Number of hits from youtube search
 editor="nano"
-play="mpv --vid=no --really-quiet" #"--load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
-#play="omxplayer" #for i in (specifyCommands); do $play $i; done
+play="mpv --vid=no --really-quiet" #" --load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
 #play="cvlc some stuff"
 #############################################################
 
@@ -42,10 +41,10 @@ w3m -dump -o display_link_number=1 https://www.youtube.com/results?search_query=
 grep "References:" -A 200 | 
 grep "\["$P"\]" |
 awk '{print $2}')
-elif [ "$A" == "a" ]; then 
+elif [ "$A" == "a" ]; then
 A "$(
 w3m -dump -o display_link_number=1 https://www.youtube.com/results?search_query="$S" |
-grep "References:" -A 200 | 
+grep "References:" -A 200 |
 grep "\["$P"\]" |
 awk '{print $2}')"
 else printf " [Number]	→ play choice\n [Number] a	→ add choice\n [empty]	→ exit\n"
