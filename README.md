@@ -5,7 +5,7 @@
 	\*can be changed
 
 #### Features:
-- streams audio from URL containing media (youtube/soundcloud/internet-radio etc.)
+- streams audio from URL containing media (youtube/internet-radio etc.)
 - playlist management create/add/edit
 - youtube search/play/add
 - small config-section within webSound.sh to more easily adjust some parameters
