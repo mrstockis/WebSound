@@ -1,4 +1,4 @@
- SYNTAX: [URL|y|p|r|l|e|SearchTerm] (Option)
+ SYNTAX: [First] (Second)
 
  [h]	→  This help
 
@@ -9,11 +9,11 @@
  [l]	→  List all playlists
  [e]	→  Edit playlist
 
- [URL] (a)	  → (a)dd [URL] to current playlist
- [SearchTerm] (p) → (p)lay [SearchTerm] from playlist
- [ListName] (l)	→  choose playlist [ListName]
- [ListName] (L)	→  create playlist [ListName]
- [ListName] (K)	→  delete playlist [ListName]
+ ['URL'] (a)	  → (a)dd [URL] to current playlist
+ ['SearchTerm'] (p) → (p)lay [SearchTerm] from playlist
+ ['ListName'] (l)	→  choose playlist [ListName]
+ ['ListName'] (L)	→  create playlist [ListName]
+ ['ListName'] (K)	→  delete playlist [ListName]
 
  <q> exits active media, <ctrl+c> stops script
 

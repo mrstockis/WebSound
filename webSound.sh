@@ -1,6 +1,7 @@
 #!/bin/bash
 #############################################################
 N=1			##Default playlist at start
+n=$N
 Folder=~/.webSound/	##Location of webSound.sh
 #clear			##Clear terminal at start
 YT=8			##Number of hits from youtube search
@@ -92,7 +93,7 @@ while printf "${c[d]}\n $N{$(grep '|' -c $Folder$N)}\n${c[dot]}${c[E]}\n"; do
 		printf "${c[b]} Created Playlist $U ${c[E]}\n"  ;;
 		K)
 		printf "${c[b]} Remove Playlist $U, with $(grep '|' -c $Folder$U) item(s)?\n"
-		printf "${c[dy]}$(cat $Folder$U) ${c[E]}\n" && rm -i $Folder$U  ;;
+		printf "${c[dy]}$(cat $Folder$U) ${c[E]}\n" && rm -i $Folder$U  && N=$n ;;
 		*)
 		printf "${c[d]}${c[r]} No proper command given${c[E]}\n"  ;;
 		esac
