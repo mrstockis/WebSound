@@ -6,18 +6,18 @@ if [[ $I ]]; then if [[ $I == "f" ]]; then
 printf "\n\033[32m -- First Installation --\033[0m\n"
 
 mkdir ~/.webSound/
-touch ~/.webSound/1
+touch ~/.webSound/demo
 
 ## adds three items to playlist 1
-printf "\n|Soundcloud\nhttps://soundcloud.com/themidnightofficial/vampires\n" >> ~/.webSound/1
-printf "\n|Youtube\nhttps://www.youtube.com/watch?v=fWRISvgAygU\n" >> ~/.webSound/1
-printf "\n|Radio\nhttp://109.123.116.202:8010/stream\n" >> ~/.webSound/1
+printf "\n|Short Tunes\nhttps://www.youtube.com/watch?v=bBs-lPvk3Zk\n" >> ~/.webSound/demo
+printf "\n|Long Tunes\nhttps://www.youtube.com/watch?v=fWRISvgAygU\n" >> ~/.webSound/demo
+printf "\n|Radio Streams\nhttp://109.123.116.202:8010/stream\n" >> ~/.webSound/demo
 
 cp webSound.sh ~/.webSound/
 cp help ~/.webSound/
 
 printf "\n Created folder: ~/.webSound/\n"
-echo " and added default playlist '1', 'webSound.sh' and 'help'"
+echo " and added default playlist 'demo', 'webSound.sh' and 'help'"
 printf "\n\033[1;34m Add alias: WebSound  to: ~/.bashrc  ? \n y/N: "
 read A
 if [[ $A == "y" ]]; then
