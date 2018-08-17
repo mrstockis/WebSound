@@ -63,7 +63,7 @@ function Add() {
 	printf "${c[b]} Added:  $E\n    To:  $N ${c[E]}\n"
 }
 
-function Ysearch() {
+function YTsearch() {
 	while true; do clear; printf "${C[youtube]}"
 		read -rep ' Search: ' s
 		history -s "$s"
@@ -78,7 +78,7 @@ function Ysearch() {
 			sed 's/ Duration://' |
 			head -n "$YT"
 
-			while true; do read -rep ' n a|d: ' P A
+			while true; do read -rep ' n (a|d): ' P A
 
 				if [ ! "$P" ]; then break; fi
 
@@ -97,7 +97,7 @@ function Ysearch() {
 					Download "$link"
 
 				else
-					printf " [Number]	→ play choice\n [Number] a	→ add choice\n [empty]	→ exit\n"
+					printf " [Number]	→ play choice\n [Number] (a|d)	→ add/download choice\n [empty]	→ exit\n"
 
 				fi
 			done
@@ -116,26 +116,27 @@ function SCsearch(){
 			w3m -dump -o display_link_number=1 https://soundcloud.com/search?q=$S |
 			grep "\[7\]" -A 30 | head -n 20
 
-			while true; do 
-				read -rep ' n (a): ' P A
+			while true; do read -rep ' n (a|d): ' P A
 
-				if [ ! "$P" ]; then break
 
-				elif [ ! "$A" ]; then
-					mpv --vid=no --really-quiet `
-					w3m -dump -o display_link_number=1 https://soundcloud.com/search?q="$S" |
+				if [ ! "$P" ]; then break; fi
+					
+				link=`w3m -dump -o display_link_number=1 https://soundcloud.com/search?q="$S" |
 					grep "References:" -A 200 |
 					grep "\["$P"\]" |
-					awk '{print $2}'`
+					awk '{print $2}' `
+
+				if [ ! "$A" ]; then
+					mpv --vid=no --really-quiet $link
 
 				elif [ "$A" == "a" ]; then
-					Add `w3m -dump -o display_link_number=1 https://soundcloud.com/search?q="$S" |
-					grep "References:" -A 200 |
-					grep "\["$P"\]" |
-					awk '{print $2}'`
+					Add $link
+				
+				elif [ "$A" == "d" ]; then
+					Download "$link"
 
 				else
-					printf " [Number]	→ play choice\n [Number] a	→ add choice\n [empty]	→ exit\n"
+					printf " [Number]	→ play choice\n [Number] (a|d)	→ add/download choice\n [empty]	→ exit\n"
 
 				fi
 			done
@@ -146,7 +147,7 @@ function SCsearch(){
 function Download() {
 	title=`youtube-dl -e $1 | cut -d" " --output-delimiter="_" -f1-`
 	echo " Saving $title to $Local"
-	youtube-dl -o $Local$title -f 140 $1 
+	youtube-dl -o $Local$title -f bestaudio $1 
 }
 
 
@@ -180,7 +181,7 @@ while printf "${c[d]} $N{$(grep '|' -c $Dir$N)}\n${c[dot]}${c[E]}\n"; do
 					done | less -r
 					clear; printf "${C[default]}";; 
 
-				y)	Ysearch  ;;
+				y)	YTsearch  ;;
 
 				s)	SCsearch ;;
 
