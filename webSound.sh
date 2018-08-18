@@ -1,13 +1,13 @@
 #!/bin/bash
 #############################################################
-clear			##Clear terminal at start
-N="inst"			##Default playlist at start
+#clear			##Clear terminal at start
+N="demo"			##Default playlist at start
 n=$N
 Dir=~/.webSound/	##Location of webSound.sh
 Local=$Dir"local/"
 Nhits=8			##Number of hits from youtube search
 editor="nano"
-player="mpv --vid=no --really-quiet --load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
+player="mpv --vid=no --really-quiet" # --load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
 #play="omxplayer -o local --vol -900"
 #############################################################
 
