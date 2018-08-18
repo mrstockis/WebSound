@@ -25,7 +25,7 @@ if [[ $I ]]; then if [[ $I == "f" ]]; then
 	fi
 
 	printf "\n\033[1m The script  -and everything else-  is found in: ~/.webSound/\n"
-	printf "\n\033[32m  Automatically Starts First Run\033[0m\n  Enter "h" for examples on usage\n\n"
+	printf "\n\033[32m  Automatically Starts First Run\033[0m\n  Enter 'h' for help section\n\n"
 	bash ~/.webSound/webSound.sh
 
 elif [[ $I == "u" ]]; then
