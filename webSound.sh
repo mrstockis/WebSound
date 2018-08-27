@@ -5,10 +5,10 @@ N="demo"			##Default playlist at start
 n=$N
 Dir=~/.webSound/	##Location of webSound.sh
 Local=$Dir"local/"
-Nhits=8			##Number of hits from youtube search
+Nhits=12			##Number of hits from youtube search
 editor="nano"
-player="mpv --vid=no --really-quiet" # --load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
-#play="omxplayer -o local --vol -900"
+player="mpv --vid=no --really-quiet "#"--load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
+#player="omxplayer -o local --vol -900"
 #############################################################
 
 
@@ -60,6 +60,20 @@ help=(" SYNTAX: [First] (Second)"
 " by editing top-section of the script '.webSound.sh'")
 
 
+
+# Snippets
+function Top() {
+	clean "${C[default]}"
+}
+function Info() {
+	printf "${c[d]} $N{$(grep '|' -c $Dir$N)}\n${c[dot]}${c[E]}\n"
+}
+function clean() {
+	clear; printf "$1"
+}
+
+
+
 function Add() {
 	E=$(printf "$(youtube-dl --flat-playlist -e "$1")\n" | head -n 1)
 
@@ -68,6 +82,13 @@ function Add() {
 	printf "\n|$E\n"$1"\n" >> $Dir$N
 	printf "${c[b]} Added:  $E\n    To:  $N ${c[E]}\n"
 }
+
+function Download() {
+	title=`youtube-dl -e $1 | cut -d" " --output-delimiter="_" -f1-`
+	echo " Saving $title to $Local"
+	youtube-dl -o $Local$title -f bestaudio $1 
+}
+
 
 
 function YTsearch() {
@@ -112,7 +133,6 @@ function YTsearch() {
 	done
 }
 
-
 function SCsearch(){
 	while true; do clean "${C[soundcloud]}"  # Title
 		read -rep ' Search: ' s
@@ -155,12 +175,12 @@ function SCsearch(){
 }
 
 
-function Download() {
-	title=`youtube-dl -e $1 | cut -d" " --output-delimiter="_" -f1-`
-	echo " Saving $title to $Local"
-	youtube-dl -o $Local$title -f bestaudio $1 
-}
 
+function Local() {
+	clean "${C[Local]}"
+	Select 
+	Top
+}
 
 function Select() {
 	declare -A items
@@ -183,31 +203,9 @@ function Select() {
 }
 
 
-function Local() {
-	clean "${C[Local]}"
-	Select 
-	Top
-}
 
-
-function Info() {
-	printf "${c[d]} $N{$(grep '|' -c $Dir$N)}\n${c[dot]}${c[E]}\n"
-}
-
-
-function clean() {
-	clear; printf "$1"
-}
-
-
-function Top() {
-	clean "${C[default]}"
-}
-
-
+# Start
 printf "${C[initial]}"
-
-## Main loop
 while true; do Info
 
 	read -rep "> " U A
