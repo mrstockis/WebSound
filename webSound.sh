@@ -12,15 +12,14 @@ player="mpv --vid=no --really-quiet "#"--load-unsafe-playlists"	##LUP-flag fixes
 #############################################################
 
 
-# "\033[ brightness ; colortext ; colorbackground m" :: (0,1,2) ; 30+(0→9) ; 40+(0→9)
+# \033[ brightness ; colortext ; colorbackground m :: (0,1,2) ; 30+(0→9) ; 40+(0→9)
 # \033[1;32;44m  :: bright green text, on blue background
 # \033[0m        :: return to white text on transparent background
 
 declare -A c
-	c[E]="\033[0m"; c[d]="\033[2m"; c[D]="\033[22m"
-	c[by]="\033[1;33m"; c[dy]="\033[2;33m"
-	c[r]="\033[31m"; c[g]="\033[32m"
-	c[b]="\033[34m"; c[bb]="\033[1;34m"
+	c[B]="\033[1m"; c[D]="\033[2m"; c[E]="\033[0m"
+	c[y]="\033[33m"; c[r]="\033[31m";
+	c[g]="\033[32m"; c[b]="\033[34m"
 	c[Er]="\033[1;39;41m"
 	c[ws]=" w e b s o u n d"; c[lo]=" l o c a l"
 	c[yt]=" y o u t u b e"; c[sc]=" s o u n d c l o u d"
@@ -28,11 +27,15 @@ declare -A c
 	c[dot]="---------------------------"
 
 declare -A C
-	C[initial]="${c[b]}${c[ws]}${c[E]}\n\n"
-	C[default]="${c[d]}${c[b]}${c[ws]}${c[E]}\n\n"
-	C[youtube]="${c[b]}${c[r]}${c[yt]}${c[E]}\n\n"
-	C[soundcloud]="${c[dy]}${c[sc]}${c[E]}\n\n"
+	C[initial]="${c[B]}${c[b]}${c[ws]}${c[E]}\n\n"
+	C[default]="${c[b]}${c[ws]}${c[E]}\n\n"
+	C[youtube]="${c[B]}${c[r]}${c[yt]}${c[E]}\n\n"
+	C[soundcloud]="${c[y]}${c[sc]}${c[E]}\n\n"
 	C[Local]="${c[g]}${c[lo]}${c[E]}\n\n"
+	C[saving]="${c[b]}Saving${c[E]}"
+	C[to]="${c[b]}to${c[E]}"
+	C[state0]="${C[B]}${c[y]}state${c[E]}"
+	C[state1]="\b\b\b\b\b${c[g]}state${c[E]}\n"
 	C[nProp]="${c[Er]}${c[bad]}${c[E]}\n\n"
 
 help=(" SYNTAX: [First] (Second)"
@@ -83,19 +86,18 @@ function Add() {
 
 function Download() {
 	title=`youtube-dl -e $1 | sed 's/\ /_/g'`
-	printf " ${c[b]}Saving${c[E]} $title ${c[b]}to${c[E]} $Local ... "
+	printf " ${C[saving]} $title ${C[to]} $Local ... "
 	state 0
 	youtube-dl -qo $Local$title -f bestaudio $1
 	state 1
 }
 
+
 function state() {
-	sf="${c[by]}state${c[E]}"
-	st="${c[g]}state${c[E]}\n"
 	if [ $1 == 0 ]; then
-		state="$sf"
+		state="${C[state0]}"
 	else
-		state="\b\b\b\b\b$st"
+		state="${C[state1]}"
 	fi
 	printf $state
 }
