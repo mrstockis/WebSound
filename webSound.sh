@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################################
-#clear			##Clear terminal at start
+#clear				##Clear terminal at start
 N="demo"			##Default playlist at start
 n=$N
 Dir=~/.webSound/	##Location of webSound.sh
@@ -19,7 +19,7 @@ player="mpv --vid=no --really-quiet "#"--load-unsafe-playlists"	##LUP-flag fixes
 declare -A c
 	c[E]="\033[0m"; c[d]="\033[2m"; c[D]="\033[22m"
 	c[by]="\033[1;33m"; c[dy]="\033[2;33m"
-	c[r]="\033[31m", c[g]="\033[32m"
+	c[r]="\033[31m"; c[g]="\033[32m"
 	c[b]="\033[34m"; c[bb]="\033[1;34m"
 	c[Er]="\033[1;39;41m"
 	c[ws]=" w e b s o u n d"; c[lo]=" l o c a l"
@@ -60,7 +60,6 @@ help=(" SYNTAX: [First] (Second)"
 " by editing top-section of the script '.webSound.sh'")
 
 
-# Snippets
 function Top() {
 	clean "${C[default]}"
 }
@@ -78,16 +77,28 @@ function Add() {
 	if [ ! "$E" ]; then E="Playlist?"; fi
 
 	printf "\n|$E\n"$1"\n" >> $Dir$N
-	printf "${c[b]} Added:  $E\n    To:  $N ${c[E]}\n"
+	printf " ${c[b]}Added:${c[E]}  $E\n    ${c[b]}To:${c[E]}  $N\n"
 }
 
 
 function Download() {
 	title=`youtube-dl -e $1 | sed 's/\ /_/g'`
-	echo " Saving $title to $Local"
-	youtube-dl -o $Local$title -f bestaudio $1
+	printf " ${c[b]}Saving${c[E]} $title ${c[b]}to${c[E]} $Local ... "
+	state 0
+	youtube-dl -qo $Local$title -f bestaudio $1
+	state 1
 }
 
+function state() {
+	sf="${c[by]}state${c[E]}"
+	st="${c[g]}state${c[E]}\n"
+	if [ $1 == 0 ]; then
+		state="$sf"
+	else
+		state="\b\b\b\b\b$st"
+	fi
+	printf $state
+}
 
 function YTsearch() {
 	while true; do clean "${C[youtube]}"
@@ -129,6 +140,7 @@ function YTsearch() {
 			done
 		fi
 	done
+	main
 }
 
 
@@ -177,7 +189,7 @@ function SCsearch(){
 function Local() {
 	clean "${C[Local]}"
 	Select
-	Top
+	Top; main
 }
 
 
@@ -193,17 +205,14 @@ function Select() {
 	while true; do
 		read -rep " n (r): " U A
 		if [ -z "$U" ]; then
-			Top
 			break
 		elif [ -z "$A" ]; then
 			$player $Local${items[$U]}
-			#clean "${C[Local]}"
-			#Select
+			Local
 		else
 			if [ "$A" == "r" ]; then
 				rm $Local${items[$U]}
-				clean "${C[Local]}"
-				Select
+				Local
 			else
 				printf "\n${C[nProp]}"; fi
 		fi
@@ -268,7 +277,6 @@ function removeList() {
 	printf "${c[dy]}`cat $Dir$1 | grep '|'` ${c[E]}\n\n"
 
 	read -p "Continue? y/N " c
-	#if [ "$c" == "y" ] || [ "$c" == "Y" ]; then
 	if ( echo $c | grep -i "y" ); then
 		rm $Dir$1
 		if [ "$1" == "$N" ]; then
@@ -290,7 +298,9 @@ function Help() {
 
 # Start
 printf "${C[initial]}"
-while true; do Info
+
+function main() {
+	Info
 
 	read -rep "> " U A
 	history -s "$U"
@@ -316,7 +326,6 @@ while true; do Info
 				e)	$editor $Dir$N  ;;
 
 				*)	playLink "$U" ;;
-
 			esac
 
 		elif [ $A ]; then
@@ -333,11 +342,13 @@ while true; do Info
 				K)	removeList "$U" ;;
 
 				*)	printf "${C[nProp]}"  ;;
-
 			esac
 		fi
 
 	else
 		Top
 	fi
-done
+	main
+}
+
+main
