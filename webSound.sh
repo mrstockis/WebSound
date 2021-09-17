@@ -1,6 +1,5 @@
 #!/bin/bash
 #############################################################
-clear				## Clear terminal at start
 playlist="demo"		## Default playlist at start
 _playlist=$playlist
 Dir=~/".webSound/"		## Path to program. Change if moved
@@ -77,7 +76,8 @@ help=(""
 ""
 " [URL] (a)         → (a)dd [URL] to current playlist"
 " [SearchTerm] (p)  → (p)lay match from playlist"
-" [SearchTerm] (k)  -> remove match from playlist"
+" [SearchTerm] (i)  → (i)nfo about matched search"
+" [SearchTerm] (k)  →  remove match from playlist"
 " [ListName] (l)    →  choose playlist [ListName]"
 " [ListName] (L)    →  create playlist [ListName]"
 " [ListName] (K)    →  delete playlist [ListName]"
@@ -255,16 +255,16 @@ function SCsearch(){
 
 function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
 #
-function ask() {
+function Search() {
   clear; printf "${C[youtube]}"
   read -p 'Search: ' ans
   [[ -z "$ans" ]] && Head && return
   history -s "$ans"
   ans=` echo $ans | sed 's/ /+/g' `
-  search "$ans"
+  scrape "$ans"
 }
 #
-function search() {
+function scrape() {
   page=` w3m -dump -o display_link_number=1 "https://www.google.com/search?q=youtube+%2B+$1" `
   N=0
   for nr in ` printf "%s\n" "$page" | grep YouTube | fgrep "[" | cut -d] -f1 `; do
@@ -318,17 +318,8 @@ function pick() {
       mpv "${LI[$pik]}" --no-video --really-quiet
       show ;;
   esac
-  #Search
 }
-#
-function Search() {
-  ask
-  Head
-  #history -s "$S"
-  #search
-  #show
-  #pick
-}
+
 
 function SearchOLD() {
 sc='https://soundcloud.com/search?q='
@@ -789,8 +780,18 @@ function main() {
 }
 
 # Start
-printf "${C[initial]}"
-main
+clear
+printf "${c[D]}${c[ws]}${c[E]}${c[b]} "
+for l in ${c[ws]}; do
+  printf "\b\b" #; sleep 0.5
+done
+for l in ${c[ws]}; do
+  printf "$l "; sleep 0.1
+done
+sleep 0.5
+
+
+Home; main
 
 
 

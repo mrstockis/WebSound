@@ -25,8 +25,11 @@ if [[ $I ]]; then if [[ $I == "f" ]]; then
 	fi
 
 	printf "\n\033[1m The script  -and everything else-  is found in: ~/.webSound/\n"
-	printf "\n\033[32m  Automatically Starts First Run\033[0m\n  Enter 'h' for help section\n\n"
-	bash ~/.webSound/webSound.sh
+  printf " Enter 'h' for help section\n\n"
+  read -p ' Press Enter ..'
+	printf "\n\033[32m  Starts WebSound, this will clear the terminal\033[0m\n"
+  read -p ' Start y/N? ' A
+  [[ $A -eq "y" ]] && bash ~/.webSound/webSound.sh || exit
 
 elif [[ $I == "u" ]]; then
 	printf "\n\033[1;32m -- Update --\033[0m\n"
