@@ -1,8 +1,8 @@
 #!/bin/bash
 #############################################################
-#clear				## Clear terminal at start
-default="demo"		## Default playlist at start
-_default=$default
+clear				## Clear terminal at start
+playlist="demo"		## Default playlist at start
+_playlist=$playlist
 Dir=~/".webSound/"		## Path to program. Change if moved
 Local=$Dir"local/"
 Nhits=20			## Number of hits from youtube search
@@ -96,7 +96,7 @@ function Home() {
 	Head #"${C[default]}"
 }
 function Info() {
-	printf "${c[d]} $default{`grep '|' -c $Dir$default`}\n${c[dot]}${c[E]}\n"
+	printf "${c[d]} $playlist{`grep '|' -c $Dir$playlist`}\n${c[dot]}${c[E]}\n"
 }
 function Head() {
 	clear
@@ -113,8 +113,8 @@ function Add() {  # << title link
 
 	#if [ ! "$E" ]; then E="Playlist?"; fi
 
-	#printf "\n|$E\n"$1"\n" >> $Dir$default
-	#printf " ${c[b]}Added:${c[E]}  $E\n    ${c[b]}To:${c[E]}  $default\n"
+	#printf "\n|$E\n"$1"\n" >> $Dir$playlist
+	#printf " ${c[b]}Added:${c[E]}  $E\n    ${c[b]}To:${c[E]}  $playlist\n"
 
 	title="$1" ; link="$2"
 	[ -z "$link" ] &&
@@ -123,8 +123,8 @@ function Add() {  # << title link
 		title=` youtube-dl -e "$1" `
 	
 
-	printf "\n|$title\n$link\n" >> $Dir$default
-	printf " ${c[b]}Added:${c[E]}  $title\n    ${c[b]}To:${c[E]}  $default\n"
+	printf "\n|$title\n$link\n" >> $Dir$playlist
+	printf " ${c[b]}Added:${c[E]}  $title\n    ${c[b]}To:${c[E]}  $playlist\n"
 	read -p " .."
 }
 
@@ -140,11 +140,11 @@ function Download() {  # << title link
 	
 	title=$1
 	fname=`printf "$title\n" | sed 's/\ /_/g'`
-	printf " ${C[saving]} $title\n ${C[to]} ~/.webSound/local/ ... "
+	printf " ${C[saving]} $title\n ${C[to]} "$Dir"local/ ... "
 	#echo $fname
 	state 0
-	youtube-dl -qo $Local$fname -f bestaudio $2
-    	printf "\n|$title\n$Local$fname\n" >> $Dir"llocal"
+	  youtube-dl -qo $Local$fname -f bestaudio $2
+    printf "\n|$title\n$Local$fname\n$2\n" >> $Dir"llocal"
 	state 1
 	read -p " .."
 }
@@ -258,7 +258,7 @@ function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
 function ask() {
   clear; printf "${C[youtube]}"
   read -p 'Search: ' ans
-  [[ -z "$ans" ]] && return
+  [[ -z "$ans" ]] && Head && return
   history -s "$ans"
   ans=` echo $ans | sed 's/ /+/g' `
   search "$ans"
@@ -288,8 +288,10 @@ function show() {
 }
 #
 function pick() {
+  echo
   read -p "Pick: " pik opt
-  ([[ -z $pik ]] && Search) || n=$((pik-1))
+  [[ -z "$pik" ]] && Search && return
+  pik=$((pik-1))
   case $opt in
     p)
       printf "Playing: %s ..\n" "${TI[$pik]}"
@@ -299,11 +301,14 @@ function pick() {
       printf "Playing video: %s ..\n" "${TI[$pik]}"
       mpv "${LI[$pik]}" --really-quiet
       show ;;
+    a)
+      Add "${TI[$pik]}" "${LI[$pik]}"
+      show ;;
     d)
-      printf "Downloading: %s ..\n" "${TI[$pik]}"
+      #printf "Downloading: %s .. " "${TI[$pik]}"
       #youtube-dl -f 140 "${LI[$n]}" >2/dev/null
       Download "${TI[$pik]}" "${LI[$pik]}"
-      read -p "Done"
+      #read
       show ;;
     i)
       youtube-dl --get-description "${LI[$pik]}" | less
@@ -313,7 +318,7 @@ function pick() {
       mpv "${LI[$pik]}" --no-video --really-quiet
       show ;;
   esac
-  Search
+  #Search
 }
 #
 function Search() {
@@ -407,37 +412,65 @@ Head; main
 
 
 function Local() {
-    _default=$default
-    default="llocal"
+  _playlist=$playlist
+  playlist="llocal"
 
-    while true; do Head "${C[Local]}"
-        grep '|' $Dir$default
+  while true; do Head "${C[Local]}"
+    grep '|' $Dir$playlist
         
-        read -rep " RegX: " U A
+    read -rep " RegX: " U opt
         
-        if [[ -z "$U" ]]; then
-            break
-        elif [ -z "$A" ]; then
-            if [ "$U" == "e" ]; then 
-				$editor $Dir$default
-            else
-                playSpecific "$U"
-                #Local
-            fi
+    [[ -z "$U" ]] && break
+    
+    case $U in
+      e)
+        $editor $Dir$playlist ;;
+      *)
+        if [[ -z "$opt" ]]; then
+          playSpecific "$U" 
+        else
+          case "$opt" in
+            i)
+              getInfo ` getLink "$U" ` ;;
+            k)
+              # Use regex to find link to file and remove its path,
+              # and then rewrite playlist, excluding that match!
+              #removeElement "$U"
+              clear ;;
+          esac
+        fi
+    esac
+  done   
+    
+    #while true; do Head "${C[Local]}"
+    #    grep '|' $Dir$playlist
+    #    
+    #    read -rep " RegX: " U A
+    #    
+    #    if [[ -z "$U" ]]; then
+    #        break
+    #    elif [ -z "$A" ]; then
+    #        if [ "$U" == "e" ]; then 
+		#		$editor $Dir$playlist
+    #        else
+    #            playSpecific "$U"
+    #            #Local
+    #        fi
        
         #!use regex to find link to file and remove its path, and then rewrite playlist, excluding that match!
-		elif [ "$A" == "k" ]; then
-		    removeElement "$U"
-		    clear
-		    #Local
-        fi
-    done
+		#elif [ "$A" == "k" ]; then
+		#    removeElement "$U"
+		#    clear
+		#    #Local
+    #    fi
+    #done
     
-    default=$_default
+    playlist=$_playlist
 	
     # Select
     
-    Head; main
+    #Head; main
+    Head
 }
 
 
@@ -469,24 +502,25 @@ function Local() {
 
 
 function playAll() {
-	printf "${c[b]} @$default ${c[E]}\n"
-	printf "${c[b]}`grep '|' $Dir$default | cut -d"|" -f1-`${c[E]}\n"
-	$player `grep -v '|' $Dir$default` 2>/dev/null
+	printf "${c[b]} @$playlist ${c[E]}\n"
+	printf "${c[b]}`grep '|' $Dir$playlist | cut -d"|" -f1-`${c[E]}\n"
+	$player `grep -v '|' $Dir$playlist` 2>/dev/null
+  Head
 }
 
 
 function playSpecific() {
     expr='\|.*'$1
     history -s "$1"
-    printf "` grep -E $expr -i $Dir$default `" | grep "|"
-    $player ` grep -E $expr -i $Dir$default -A 1 | grep -v "|" `
+    printf "` grep -E $expr -i $Dir$playlist `" | grep "|"
+    $player ` grep -E $expr -i $Dir$playlist -A 1 | grep -v "|" `
     Head
-    #if [ ! "`grep -i $1 $Dir$default | grep '|'`" ]; then
-	#	printf "${c[b]}`grep -i $1 $Dir$default`${c[E]}\n\n"
-	#	$player `grep -i $1 $Dir$default` 2>/dev/null
+    #if [ ! "`grep -i $1 $Dir$playlist | grep '|'`" ]; then
+	#	printf "${c[b]}`grep -i $1 $Dir$playlist`${c[E]}\n\n"
+	#	$player `grep -i $1 $Dir$playlist` 2>/dev/null
 	#else
-	#	f=(); f+=(`grep -iA 1 $1 $Dir$default | egrep -v '\|'`)
-	#	printf "${c[b]}`grep -i $1 $Dir$default`${c[E]}\n\n"
+	#	f=(); f+=(`grep -iA 1 $1 $Dir$playlist | egrep -v '\|'`)
+	#	printf "${c[b]}`grep -i $1 $Dir$playlist`${c[E]}\n\n"
 	#	$player ${f[@]} 2>/dev/null
 	#fi
 }
@@ -508,13 +542,16 @@ function playLink() {
 function getLink() {
     expr='\|.*'$1
     #history -s "$1"
-    grep -E $expr -i $Dir$default -A 1 | grep -v "|" | head -n 1
+    grep -E $expr -i $Dir$playlist -A 2 | egrep -v "\||webSound" | head -n 1
 }
 
 
 function getInfo() {
 	link=$1
-	#dump=`lynx -dump $link | sed 's/\[..\]//g'` >/dev/null
+  youtube-dl --get-description "$1" | less
+	return
+  
+  #dump=`lynx -dump $link | sed 's/\[..\]//g'` >/dev/null
 	dump=`w3m -dump $link` >/dev/null
 	both=`echo "$dump" |
         	grep "t like" -B2 |
@@ -573,7 +610,7 @@ function playVideo() {
 	fileV=$Dir.tmpVid.mp4
 	#fileA=$Dir.tmpAud.mp4
 
-	flags=`                                   # medium as default
+	flags=`                                   # medium as playlist
 	 [ $3 ] && (
 	  [ $3 == h ] && echo "-xterm256unicode"  # high
           [ $3 == l ] && echo "-fast"             # low
@@ -600,7 +637,7 @@ function playVideo() {
 
 
 function createList() {
-	touch $Dir$1; default=$1
+	touch $Dir$1; playlist=$1
 
 	printf "${c[b]} Created Playlist $1 ${c[E]}\n"
 }
@@ -620,15 +657,15 @@ function listLists() {
 
 
 function readList() {
-    grep '|' $Dir$default | less
-	#cat $Dir$default 2>/dev/null | less
+    grep '|' $Dir$playlist | less
+	#cat $Dir$playlist 2>/dev/null | less
 	Head
 }
 
 
 function goToList() {
 	new=` ls $Dir | egrep -iv 'websound|local' | grep -iE $1 | head -n 1 `
-	[ $new ] && default=$new || printf "$cError No matching playlist $fClear\n"
+	[ $new ] && playlist=$new || printf "$cError No matching playlist $fClear\n"
 }
 
 
@@ -639,8 +676,8 @@ function removeList() {
 	read -p "Continue? y/N " c
 	if ( echo $c | grep -i "y" ); then
 		rm $Dir$1
-		if [ "$1" == "$default" ]; then
-			default=$_default
+		if [ "$1" == "$playlist" ]; then
+			playlist=$_playlist
 		fi
 	fi
 	Head
@@ -650,19 +687,19 @@ function removeList() {
 
 function removeElement() {
     
-    hits=`grep -Ei '\|.*'$1 $Dir$default`
+    hits=`grep -Ei '\|.*'$1 $Dir$playlist`
     echo "$hits"
     echo
     read -rep "Delete? y/N : " D
     
     if [ "$D" != "y" ]; then return; fi    
     
-    if [ $default == "llocal" ]; then
+    if [ $playlist == "llocal" ]; then
         rm $Local"`ls $Local | grep -Ei $1`"
     fi
     
-    tmpList=`grep -v "$(grep -A1 "$hits" $Dir$default | grep -v '|')" $Dir$default`
-    echo "$tmpList" | grep -v "$hits" > $Dir$default
+    tmpList=`grep -v "$(grep -A1 "$hits" $Dir$playlist | grep -v '|')" $Dir$playlist`
+    echo "$tmpList" | grep -v "$hits" > $Dir$playlist
 
     #Head
 }
@@ -691,8 +728,8 @@ function main() {
 	dbq=`date +%s`  # double quit
 	while true; do
   
-  [[ -z `ls "$Dir" | grep "$default"` ]] && 
-    default=`ls "$Dir" | grep -v "llocal\|local\|webSound.sh"`
+  [[ -z `ls "$Dir" | grep "$playlist"` ]] && 
+    playlist=`ls "$Dir" | grep -v "llocal\|local\|webSound.sh"`
 	
   Info
 
@@ -719,7 +756,7 @@ function main() {
 				p)	playAll  ;;
 				r)	readList ;;
 				l)	listLists  ;;
-				e)	$editor $Dir$default  ;;
+				e)	$editor $Dir$playlist  ;;
 				*)	playLink "$U" ;;
 
 			esac
