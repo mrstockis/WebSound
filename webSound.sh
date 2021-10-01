@@ -282,42 +282,45 @@ function scrape() {
 function show() {
   Head "${C[youtube]}"
   for ((n=0; n<N; n++)); do
-    printf "%s:\t%s / %s\n" "$((n+1))" "${TI[$n]}" "${DU[$n]}"
+    [[ $1 ]] && [[ n -eq $1 ]] && selection=$fBright || selection=$fClear  # Highlight selected
+    printf "$selection%s:\t%s / %s\n" "$((n+1))" "${TI[$n]}" "${DU[$n]}"
   done
-  pick
+  echo
+  [[ -z $1 ]] && pick
 }
 #
 function pick() {
-  echo
   read -p "Pick: " pik opt
   [[ -z "$pik" ]] && Search && return
   pik=$((pik-1))
+  show $pik
   case $opt in
     p)
-      printf "Playing: %s ..\n" "${TI[$pik]}"
-      mpv "${LI[$pik]}" --no-video --really-quiet
-      show ;;
+      printf "$fDark Audio stream .. $fClear" #: s ..\n" "${TI[$pik]}
+      mpv "${LI[$pik]}" --no-video --really-quiet ;;
+      #show ;;
     v)
-      printf "Playing video: %s ..\n" "${TI[$pik]}"
-      mpv "${LI[$pik]}" --really-quiet
-      show ;;
+      printf "$fDark Video stream .. $fClear" #: s ..\n" "${TI[$pik]}
+      mpv "${LI[$pik]}" --really-quiet ;;
+      #show ;;
     a)
-      Add "${TI[$pik]}" "${LI[$pik]}"
-      show ;;
+      Add "${TI[$pik]}" "${LI[$pik]}" ;;
+      #show ;;
     d)
       #printf "Downloading: %s .. " "${TI[$pik]}"
       #youtube-dl -f 140 "${LI[$n]}" >2/dev/null
-      Download "${TI[$pik]}" "${LI[$pik]}"
+      Download "${TI[$pik]}" "${LI[$pik]}" ;;
       #read
-      show ;;
+      #show ;;
     i)
-      youtube-dl --get-description "${LI[$pik]}" | less
-      show ;;
+      youtube-dl --get-description "${LI[$pik]}" | less ;;
+      #show ;;
     *)
-      printf "Playing: %s ..\n" "${TI[$pik]}"
-      mpv "${LI[$pik]}" --no-video --really-quiet
-      show ;;
+      printf "$fDark Audio stream .. $fClear" #: s ..\n" "${TI[$pik]}
+      mpv "${LI[$pik]}" --no-video --really-quiet  ;;
+      #show ;;
   esac
+  show
 }
 
 
