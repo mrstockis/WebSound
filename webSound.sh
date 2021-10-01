@@ -720,7 +720,7 @@ function main() {
 	while true; do
   
   [[ -z `ls "$Dir" | grep "$playlist"` ]] && 
-    playlist=`ls "$Dir" | grep -v "llocal\|local\|webSound.sh"`
+    playlist=`ls "$Dir" | egrep -v 'local|webSound' | head -n1`
 	
   Info
 
@@ -780,16 +780,16 @@ function main() {
 }
 
 # Start
+
 clear
 printf "${c[D]}${c[ws]}${c[E]}${c[b]} "
 for l in ${c[ws]}; do
   printf "\b\b" #; sleep 0.5
 done
 for l in ${c[ws]}; do
-  printf "$l "; sleep 0.1
+  printf "$l "; sleep 0.05
 done
 sleep 0.5
-
 
 Home; main
 
