@@ -265,7 +265,7 @@ function Search() {
 }
 #
 function scrape() {
-  page=` w3m -dump -o display_link_number=1 "https://www.google.com/search?q=youtube+%2B+$1" `
+  page=` w3m -dump -o display_link_number=1 "google.com/search?q=youtube+%2B+$1" `  # "https://www.google.com/search?q=youtube+%2B+$1" `
   N=0
   for nr in ` printf "%s\n" "$page" | grep YouTube | fgrep "[" | cut -d] -f1 `; do
     ti=` printf '%s\n' "$page" | fgrep "$nr" | head -n1 | cut -d']' -f2- | awk -F'- YouTube' '{print $1}' `
