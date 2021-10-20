@@ -257,7 +257,8 @@ function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
 #
 function Search() {
   clear; printf "${C[youtube]}"
-  read -p 'Search: ' ans
+  read -ep 'Search: ' ans
+	history -s "$ans"
   [[ -z "$ans" ]] && Head && return
   history -s "$ans"
   ans=` echo $ans | sed 's/ /+/g' `
@@ -290,7 +291,8 @@ function show() {
 }
 #
 function pick() {
-  read -p "Pick: " pik opt
+  read -ep "Pick: " pik opt
+  history -s "$pik"
   [[ -z "$pik" ]] && Search && return
   pik=$((pik-1))
   show $pik
@@ -751,6 +753,16 @@ function main() {
 				r)	readList ;;
 				l)	listLists  ;;
 				e)	$editor $Dir$playlist  ;;
+        u)
+          read -p "Update youtube-dl? y/N: " up
+          [[ -z "$up" ]] || (
+            #sudo -k
+            #sudo -v
+            sudo curl -sSL https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl 2>/dev/null
+            sudo chmod a+rx /usr/local/bin/youtube-dl
+            )
+            Home
+           ;;
 				*)	playLink "$U" ;;
 
 			esac
