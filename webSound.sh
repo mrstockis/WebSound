@@ -1,7 +1,7 @@
 #!/bin/bash
 #############################################################
-playlist="demo"		## Default playlist at start
-_playlist=$playlist
+playlist="lofi"		## Default playlist at start
+_playlist=$paylist
 Dir=~/".webSound/"		## Path to program. Change if moved
 Local=$Dir"local/"
 Nhits=20			## Number of hits from youtube search
@@ -15,6 +15,8 @@ player="mpv --vid=no --really-quiet" #"--load-unsafe-playlists"	##LUP-flag fixes
 # \033[1;32;44m  :: bright green text, on blue background
 # \033[0m        :: return to white text on transparent background
 
+source $Dir"functs/formats"
+
 declare -A c
 	c[B]="\033[1m"; c[D]="\033[2m"; c[E]="\033[0m"
 	c[y]="\033[33m"; c[r]="\033[31m";
@@ -23,13 +25,12 @@ declare -A c
 	c[ws]=" w e b s o u n d"; c[lo]=" l o c a l"
 	c[yt]=" y o u t u b e"; c[sc]=" s o u n d c l o u d"
 	c[bad]=" No proper command. Enter 'h' for help"
-	#c[dot]="---------------------------"
 	c[dot]="-----------------------"
 
 declare -A C
 	C[initial]="${c[B]}${c[b]}${c[ws]}${c[E]}\n\n"
 	C[default]="${c[b]}${c[ws]}${c[E]}\n\n"
-	C[youtube]="${c[B]}${c[r]}${c[yt]}${c[E]}\n\n"
+	C[youtube]="${c[r]}${c[yt]}${c[E]}\n\n"
 	C[soundcloud]="${c[y]}${c[sc]}${c[E]}\n\n"
 	C[Local]="${c[g]}${c[lo]}${c[E]}\n"
 	C[saving]="${c[b]}Saving${c[E]}"
@@ -77,6 +78,7 @@ help=(""
 " [URL] (a)         → (a)dd [URL] to current playlist"
 " [SearchTerm] (p)  → (p)lay match from playlist"
 " [SearchTerm] (i)  → (i)nfo about matched search"
+" [SearchTerm] (w)  → (w)eb address of matched"
 " [SearchTerm] (k)  →  remove match from playlist"
 " [ListName] (l)    →  choose playlist [ListName]"
 " [ListName] (L)    →  create playlist [ListName]"
@@ -87,7 +89,7 @@ help=(""
 " <q> exits active media <ctrl+c> stops script"
 ""
 " Some preferences(player,editor,etc.) can be made "
-" by editing top-section of the script '.webSound.sh'"
+" by editing top-section of the script 'webSound.sh'"
 "")
 
 
@@ -253,7 +255,7 @@ function SCsearch(){
 
 
 
-function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
+#function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
 #
 function Search() {
   clear; printf "${C[youtube]}"
@@ -427,7 +429,7 @@ function Local() {
         else
           case "$opt" in
             i)
-              getInfo ` getLink "$U" ` ;;
+              getInfo ` readLink "$U" ` ;;
             k)
               # Use regex to find link to file and remove its path,
               # and then rewrite playlist, excluding that match!
@@ -461,12 +463,12 @@ function Local() {
     #    fi
     #done
     
-    playlist=$_playlist
+  playlist=$_playlist
 	
     # Select
     
     #Head; main
-    Head
+  Head
 }
 
 
@@ -507,7 +509,7 @@ function playAll() {
 
 function playSpecific() {
     expr='\|.*'$1
-    history -s "$1"
+    #history -s "$1"
     printf "` grep -E $expr -i $Dir$playlist `" | grep "|"
     $player ` grep -E $expr -i $Dir$playlist -A 1 | grep -v "|" `
     Head
@@ -534,69 +536,21 @@ function playLink() {
 	fi
 }
 
+function readTitle() {
+  expr='\|.*'$1
+  grep -E $expr -i $Dir$playlist -A 2 | egrep "\|" | head -n 1
+}
 
-function getLink() {
-    expr='\|.*'$1
-    #history -s "$1"
-    grep -E $expr -i $Dir$playlist -A 2 | egrep -v "\||webSound" | head -n 1
+function readLink() {
+  expr='\|.*'$1
+  grep -E $expr -i $Dir$playlist -A 2 | egrep -v "\|" | head -n 1
 }
 
 
 function getInfo() {
 	link=$1
   youtube-dl --get-description "$1" | less
-	return
-  
-  #dump=`lynx -dump $link | sed 's/\[..\]//g'` >/dev/null
-	dump=`w3m -dump $link` >/dev/null
-	both=`echo "$dump" |
-        	grep "t like" -B2 |
-        	head -n1`
-	title=`echo "$dump" |
-		grep whyClose -A2 |
-		tail -n1`
-	info=`echo "$dump" |
-		grep 'Published on' -A 100 | 
-		grep ' Category' -B 100 | grep ' Category' -v
-		#grep BUTTON -B 100 | grep -v BUTTON
-		`
-	
-	likes=`echo $both | cut -d' ' -f1 | sed 's/,//g' `
-	dislikes=`echo $both | sed 's/,//g' | awk '{print $2}' `
-	#both="$likes|$dislikes"
-
-	#bRate=`echo $(( likes*100 / (likes+dislikes) ))`
-
-	let likes=likes+1
-	let dislikes=dislikes+1
-	let total=likes+dislikes
-	let rate=(likes*100)/total
-	#echo Approval $both $rate% "\n" "$dump" #| less
-	#printf "Approval %s\n\n%d\n" "$both" "$rate" "$dump" #| less
-	#(echo Rating: $rate% $likes\|$dislikes && echo "$dump") | less
-	#bar=`
-	#printf "$cRed"; for i in {1..10}; do printf "-"; done
-	#printf "\r"
-	#printf "$cGreen"; for i in $( seq 1 $bl ); do printf "-";done
-	#[ 5 -lt $(( rate-bl*10 )) -gt 5 ] && printf "$cYellow-"
-	#echo -e $fClear`
-	bl=$(( rate/10 ))
-	bar=`
-	printf "$cGreen"; for i in $( seq 1 $bl ); do printf "-"; done
-	[ 5 -le $(( rate-bl*10 )) ] && let bl=bl+1 && printf "$cYellow-"
-	printf "$cRed"; for i in $( seq $bl 9 ); do printf "-"; done
-	echo -e $fClear`
-	(echo -e "$fBright$title$fClear" &&
-		printf "Likes $bar " &&
-		echo -e $rate% &&
-		echo "$info") | less -r
-	#echo both = $both
-	#echo likes = $likes
-	#echo dislikes = $dislikes
-	#echo total = likes+dislikes = $((likes+dislikes))
-	#echo rate = "(likes*100)/total = " $(( (likes*100)/total ))
-	#echo likes $(())
-
+	#return  
 }
 
 
@@ -640,21 +594,15 @@ function createList() {
 
 
 function listLists() {
-#	printf "${c[b]} Playlist	Items\n${c[E]}"
-#	for i in `ls $Dir | egrep -iv 'websound|local'`; do
-#		printf " $i		`grep '|' -c $Dir$i`\n"
-#	done; echo
-
-        printf "${c[b]} %-15s %s${c[E]}\n" "Playlist" "Items"
-	for i in `ls $Dir | egrep -iv 'websound|local'`; do
+  printf "${c[b]} %-15s %s${c[E]}\n" "Playlist" "Items"
+	for i in `ls $Dir | egrep -iv 'functs|websound|local'`; do
 		printf " %-18s %2s\n" $i `grep '|' -c $Dir$i`
 	done; echo
 }
 
 
 function readList() {
-    grep '|' $Dir$playlist | less
-	#cat $Dir$playlist 2>/dev/null | less
+  grep '|' $Dir$playlist | less
 	Head
 }
 
@@ -697,25 +645,45 @@ function removeElement() {
     tmpList=`grep -v "$(grep -A1 "$hits" $Dir$playlist | grep -v '|')" $Dir$playlist`
     echo "$tmpList" | grep -v "$hits" > $Dir$playlist
 
-    #Head
 }
 
 
+function showLink() {
+  T=`readTitle "$1"`
+  L=`readLink "$1"`
+  printf "
+ $cBlue$T$fClear
+ $L\n"
+  echo
+}
+
+function update() {
+  read -p "Update youtube-dl? y/N: " up
+  [[ -z "$up" ]] || (
+    sudo curl -sSL https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl 2>/dev/null
+    sudo chmod a+rx /usr/local/bin/youtube-dl
+  )
+  Home
+}
+
 
 function Help() {
-	for i in "${help[@]}"; do
+
+  for i in "${help[@]}"; do
 		printf "\033[1m$i${c[E]}\n"
 	done | less -r
-	Head
+	
+  Head
+
 }
 
 
 
 function Quit() {
-    Head "\033[2m${c[ws]}${c[E]}"
-    sleep .5
-    clear
-    exit
+  Head "\033[2m${c[ws]}${c[E]}"
+  sleep .5
+  clear
+  exit
 }
 
 
@@ -724,8 +692,8 @@ function main() {
 	dbq=`date +%s`  # double quit
 	while true; do
   
-  [[ -z `ls "$Dir" | grep "$playlist"` ]] && 
-    playlist=`ls "$Dir" | egrep -v 'local|webSound' | head -n1`
+  [[ -z `ls "$Dir" | egrep "^$playlist$"` ]] && 
+    playlist=`ls "$Dir" | egrep -v 'functs|local|webSound' | head -n1`
 	
   Info
 
@@ -744,7 +712,7 @@ function main() {
 		if [ ! $A ]; then
 			case $U in
 				h)	Help  ;;
-                #Q)  Quit  ;;
+        q)  Quit  ;;
 				#y)	YTsearch  ;;
 				#s)	SCsearch ;;
 				y|s)	Search $U ;;
@@ -753,16 +721,7 @@ function main() {
 				r)	readList ;;
 				l)	listLists  ;;
 				e)	$editor $Dir$playlist  ;;
-        u)
-          read -p "Update youtube-dl? y/N: " up
-          [[ -z "$up" ]] || (
-            #sudo -k
-            #sudo -v
-            sudo curl -sSL https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl 2>/dev/null
-            sudo chmod a+rx /usr/local/bin/youtube-dl
-            )
-            Home
-           ;;
+        u)  update ;;
 				*)	playLink "$U" ;;
 
 			esac
@@ -772,8 +731,9 @@ function main() {
 
 				p)	playSpecific "$U";;
 				a)	Add "$U"  ;;
-				i)  getInfo `getLink "$U"` ;;
-				#v)  video `getLink "$U"`  ;;
+				i)  getInfo `readLink "$U"` ;;
+        w)  showLink "$U" ;;
+				#v)  video `readLink "$U"`  ;;
 				k)  removeElement "$U"; Head ;;
 				l)  goToList $U  ;;
 				L)	createList "$U" ;;
@@ -787,7 +747,6 @@ function main() {
 		# double quit check
 		[ $((`date +%s`-$dbq)) -lt 1 ] && Quit || dbq=`date +%s`
 		
-		#Head
 	fi
 	
 	done
@@ -807,9 +766,4 @@ done
 sleep 0.5
 
 Home; main
-
-
-
-
-
 
