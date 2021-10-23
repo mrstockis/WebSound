@@ -7,6 +7,9 @@ Local=$Dir"local/"
 Nhits=20			## Number of hits from youtube search
 editor="nano"  ## Change to prefered editor
 player="mpv --vid=no --really-quiet" #"--load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
+quality_lo='bestvideo[height<=?480][fps<=?30][vcodec!=?vp9]+bestaudio'
+quality_hi='bestvideo[height<=?1080][fps<=?30][vcodec!=?vp9]+bestaudio'
+mode="p"
 #player="omxplayer -o local --vol -900"
 #############################################################
 
@@ -27,13 +30,14 @@ declare -A c
 	c[bad]=" No proper command. Enter 'h' for help"
 	c[dot]="-----------------------"
 
+
 declare -A C
 	C[initial]="${c[B]}${c[b]}${c[ws]}${c[E]}\n\n"
 	C[default]="${c[b]}${c[ws]}${c[E]}\n\n"
 	C[youtube]="${c[r]}${c[yt]}${c[E]}\n\n"
 	C[soundcloud]="${c[y]}${c[sc]}${c[E]}\n\n"
 	C[Local]="${c[g]}${c[lo]}${c[E]}\n"
-	C[saving]="${c[b]}Saving${c[E]}"
+	C[downloading]="${c[b]}Downloading${c[E]}"
 	C[to]="${c[b]}to${c[E]}"
 	C[state0]="${C[B]}${c[y]}state${c[E]}"
 	C[state1]="\b\b\b\b\b${c[g]}state${c[E]}"
@@ -43,6 +47,7 @@ declare -A C
 fBright="\033[1m"; fDark="\033[2m"; fClear="\033[0m"
 cYellow="\033[33m"; cRed="\033[31m";
 cGreen="\033[32m"; cBlue="\033[34m"
+cPurple="\033[35m"; cTeal="\033[36m"
 cError="\033[1;39;41m"; sError=" No proper command. Enter 'h' for help"
 sMain=" w e b s o u n d"; sLocal=" l o c a l"
 sYoutube=" y o u t u b e"; sSoundcloud=" s o u n d c l o u d"
@@ -142,12 +147,39 @@ function Download() {  # << title link
 	
 	title=$1
 	fname=`printf "$title\n" | sed 's/\ /_/g'`
-	printf " ${C[saving]} $title\n ${C[to]} "$Dir"local/ ... "
+	printf " ${C[downloading]} $title\n ${C[to]} "$Dir"local/\n"
 	#echo $fname
-	state 0
-	  youtube-dl -qo $Local$fname -f bestaudio $2
-    printf "\n|$title\n$Local$fname\n$2\n" >> $Dir"llocal"
-	state 1
+	#  youtube-dl -qo $Local$fname -f bestaudio $2
+	printf "$cYellow Preparing" #state 0
+  size1=` youtube-dl -F $2 | grep 140 | awk '{print $12}' `
+  size2=` echo $size1 | cut -dM -f1 | sed 's/\.//g'`
+  size2=$(( ( $size2*1024*1024 ) / 100 ))
+  
+  youtube-dl -qf 140 $2 -o $Local$fname &
+  
+  odd=1
+  while [ ! -f $Local$fname* ]; do 
+    (( $odd )) && printf "." && odd=0 || odd=1
+    sleep 1
+  done
+  
+  while [ -f "$Local$fname.part" ]; do
+    part1=` ls -oh $Local$fname* | grep .part | awk '{print $4}' `
+    part2=` ls  -o $Local$fname* | grep .part | awk '{print $4}' `
+    perc=$(( ($part2*100)/$size2 ))
+    printf "\r  $part1 / $size1 $perc%% "
+    fin=1
+    sleep 1 & (read -t 1 && wait ) || fin=0
+    (( $fin )) && break
+    #sleep 1
+  done
+  pkill youtube-dl
+  [ -f $Local*.part ] && rm $Local*.part
+  
+  [ -f $Local$fname ] &&
+  printf "\n|$title\n$Local$fname\n$2\n" >> $Dir"llocal"
+	
+  printf "\r $cTeal$part1 / $size1  Done$fClear "
 	read -p " .."
 }
 
@@ -293,7 +325,7 @@ function show() {
 }
 #
 function pick() {
-  read -ep "Pick: " pik opt
+  read -ep "Select: " pik opt
   history -s "$pik"
   [[ -z "$pik" ]] && Search && return
   pik=$((pik-1))
@@ -303,10 +335,13 @@ function pick() {
       printf "$fDark Audio stream .. $fClear" #: s ..\n" "${TI[$pik]}
       mpv "${LI[$pik]}" --no-video --really-quiet ;;
       #show ;;
-    v)
+    v|vl)
       printf "$fDark Video stream .. $fClear" #: s ..\n" "${TI[$pik]}
-      mpv "${LI[$pik]}" --really-quiet ;;
+      mpv "${LI[$pik]}" --really-quiet --ytdl-format=$quality_lo ;;
       #show ;;
+    V|vh)
+      printf "$fDark Video stream .. $fClear" #: s ..\n" "${TI[$pik]}
+      mpv "${LI[$pik]}" --really-quiet --ytdl-format=$quality_hi ;;
     a)
       Add "${TI[$pik]}" "${LI[$pik]}" ;;
       #show ;;
@@ -319,12 +354,28 @@ function pick() {
     i)
       youtube-dl --get-description "${LI[$pik]}" | less ;;
       #show ;;
+    w)
+      printf " $cBlue${TI[$pik]}$fClear\n"; echo " ${LI[$pik]}"; read -p ' ...' ;;
     *)
       printf "$fDark Audio stream .. $fClear" #: s ..\n" "${TI[$pik]}
       mpv "${LI[$pik]}" --no-video --really-quiet  ;;
       #show ;;
   esac
   show
+}
+
+playVideo() {
+  printf "`readTitle $1`\n"
+  case $2 in
+    v|vl)
+      printf "$fDark Video stream .. $fClear" #: s ..\n" "${TI[$pik]}
+      mpv `readLink $1` --really-quiet --ytdl-format=$quality_lo ;;
+      #show ;;
+    V|vh)
+      printf "$fDark Video stream .. $fClear" #: s ..\n" "${TI[$pik]}
+      mpv `readLink $1` --really-quiet --ytdl-format=$quality_hi ;;
+  esac
+  Head #echo 
 }
 
 
@@ -412,13 +463,14 @@ Head; main
 function Local() {
   _playlist=$playlist
   playlist="llocal"
+  mode="d"
 
   while true; do Head "${C[Local]}"
-    grep '|' $Dir$playlist
-        
+    grep '|' $Dir$playlist | cut -d'|' -f2-
+    echo    
     read -rep " RegX: " U opt
         
-    [[ -z "$U" ]] && break
+    [[ -z "$U" ]] && mode="p" && break
     
     case $U in
       e)
@@ -430,6 +482,14 @@ function Local() {
           case "$opt" in
             i)
               getInfo ` readLink "$U" ` ;;
+            w)
+              showLink "$U" ; read -p ' ..';;
+            v)
+              printf "$fDark Video stream .. $fClear"
+              mpv `readLink "$U"` --really-quiet --ytdl-format=$quality_lo ;;
+            V)
+              printf "$fDark Video stream .. $fClear"
+              mpv `readLink "$U"` --really-quiet --ytdl-format=$quality_hi ;;
             k)
               # Use regex to find link to file and remove its path,
               # and then rewrite playlist, excluding that match!
@@ -508,11 +568,20 @@ function playAll() {
 
 
 function playSpecific() {
-    expr='\|.*'$1
-    #history -s "$1"
-    printf "` grep -E $expr -i $Dir$playlist `" | grep "|"
-    $player ` grep -E $expr -i $Dir$playlist -A 1 | grep -v "|" `
-    Head
+  #expr='\|.*'$1
+  #history -s "$1"
+  #printf "` grep -E $expr -i $Dir$playlist `" | grep "|"
+  #$player ` grep -E $expr -i $Dir$playlist -A 1 | grep -v "|" `
+  
+  #echo "$mode"
+  printf "`readTitle $1` \n"
+  #[ "$mode" = "p" ] && echo `readLink $1` || echo `readPath $1`
+  [ "$mode" = "p" ] && $player $(printf "`readLink $1`") || $player $(printf "`readPath "$1"`")
+
+  #[ "$mode" = "p" ] && printf "`readLink $1`" || printf "`readPath "$1"`"
+  #read 
+  
+  Head
     #if [ ! "`grep -i $1 $Dir$playlist | grep '|'`" ]; then
 	#	printf "${c[b]}`grep -i $1 $Dir$playlist`${c[E]}\n\n"
 	#	$player `grep -i $1 $Dir$playlist` 2>/dev/null
@@ -538,12 +607,17 @@ function playLink() {
 
 function readTitle() {
   expr='\|.*'$1
-  grep -E $expr -i $Dir$playlist -A 2 | egrep "\|" | head -n 1
+  grep -E $expr -i $Dir$playlist | cut -d'|' -f2-
 }
 
 function readLink() {
   expr='\|.*'$1
-  grep -E $expr -i $Dir$playlist -A 2 | egrep -v "\|" | head -n 1
+  grep -E $expr -i $Dir$playlist -A 2 | egrep "^[^|]" | grep "www"
+}
+
+function readPath() {
+  expr='\|.*'$1
+  grep -E $expr -i $Dir$playlist -A 2 | egrep "^[^|]" | grep "$Local"
 }
 
 
@@ -554,7 +628,7 @@ function getInfo() {
 }
 
 
-function playVideo() {
+function oldVideo() {
 	title="$1"
 	link="$2"
 	fileV=$Dir.tmpVid.mp4
@@ -562,11 +636,11 @@ function playVideo() {
 
 	flags=`                                   # medium as playlist
 	 [ $3 ] && (
-	  [ $3 == h ] && echo "-xterm256unicode"  # high
-          [ $3 == l ] && echo "-fast"             # low
-          [ $3 == b ] && echo "-nocolor"          # bad
-          [ $3 == B ] && echo "-nocolor -fast"    # like really bad
-        )
+	 [ $3 == h ] && echo "-xterm256unicode"  # high
+   [ $3 == l ] && echo "-fast"             # low
+   [ $3 == b ] && echo "-nocolor"          # bad
+   [ $3 == B ] && echo "-nocolor -fast"    # like really bad
+   )
 	`
 	
 	printf "\n$cBlue Preparing video of$fClear$fBright $title $fClear\n "
@@ -602,8 +676,8 @@ function listLists() {
 
 
 function readList() {
-  grep '|' $Dir$playlist | less
-	Head
+  [ "$1" = "r" ] && grep '|' $Dir$playlist | less || (Head && grep '|' $Dir$playlist )
+	#Head
 }
 
 
@@ -700,12 +774,6 @@ function main() {
 	read -rep "> " U A
 	history -s "$U"
 	
-	# Triple tap exit
-	#[ -z $U ] && Head "\033[2;31m${c[ws]}${c[E]}\n" && Info &&
-	#read -rep "> " U A &&
-	#[ -z $U ] && Head "\033[2m${c[ws]}\n" && Info &&
-	#printf "${c[E]}" && read -rep "> " U A && [ -z $U ] && break
-
 	Head
 	if [ $U ]; then #Head
 
@@ -715,10 +783,10 @@ function main() {
         q)  Quit  ;;
 				#y)	YTsearch  ;;
 				#s)	SCsearch ;;
-				y|s)	Search $U ;;
+			y|s)	Search $U ;;
 				d)	Local ;;
 				p)	playAll  ;;
-				r)	readList ;;
+			r|R)	readList $U ;;
 				l)	listLists  ;;
 				e)	$editor $Dir$playlist  ;;
         u)  update ;;
@@ -734,6 +802,8 @@ function main() {
 				i)  getInfo `readLink "$U"` ;;
         w)  showLink "$U" ;;
 				#v)  video `readLink "$U"`  ;;
+      v|V)  playVideo "$U" "$A" ;;
+        d)  Download `readTitle "$U"` `readLink "$U"` ;;
 				k)  removeElement "$U"; Head ;;
 				l)  goToList $U  ;;
 				L)	createList "$U" ;;
