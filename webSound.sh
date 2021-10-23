@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################################
-playlist="lofi"		## Default playlist at start
+playlist="demo"		## Default playlist at start
 _playlist=$paylist
 Dir=~/".webSound/"		## Path to program. Change if moved
 Local=$Dir"local/"
@@ -28,7 +28,7 @@ declare -A c
 	c[ws]=" w e b s o u n d"; c[lo]=" l o c a l"
 	c[yt]=" y o u t u b e"; c[sc]=" s o u n d c l o u d"
 	c[bad]=" No proper command. Enter 'h' for help"
-	c[dot]="-----------------------"
+	c[dot]="-----------------"
 
 
 declare -A C
@@ -467,7 +467,7 @@ function Local() {
 
   while true; do Head "${C[Local]}"
     grep '|' $Dir$playlist | cut -d'|' -f2-
-    echo    
+    echo ${c[dot]}   
     read -rep " RegX: " U opt
         
     [[ -z "$U" ]] && mode="p" && break
@@ -668,9 +668,9 @@ function createList() {
 
 
 function listLists() {
-  printf "${c[b]} %-15s %s${c[E]}\n" "Playlist" "Items"
+  printf "${c[b]} %-10s%*s${c[E]}\n" "Playlist" 4 "Items"
 	for i in `ls $Dir | egrep -iv 'functs|websound|local'`; do
-		printf " %-18s %2s\n" $i `grep '|' -c $Dir$i`
+		printf " %-10s %*s\n" $i 4 `grep '|' -c $Dir$i`
 	done; echo
 }
 
@@ -790,14 +790,14 @@ function main() {
 				l)	listLists  ;;
 				e)	$editor $Dir$playlist  ;;
         u)  update ;;
-				*)	playLink "$U" ;;
+				*)	playSpecific "$U" ;;
 
 			esac
 
 		elif [ $A ]; then
 			case $A in
 
-				p)	playSpecific "$U";;
+				p)	playLink "$U";;
 				a)	Add "$U"  ;;
 				i)  getInfo `readLink "$U"` ;;
         w)  showLink "$U" ;;
