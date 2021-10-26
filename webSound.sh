@@ -1,7 +1,7 @@
 #!/bin/bash
 #############################################################
 playlist="demo"		## Default playlist at start
-_playlist=$paylist
+_playlist=$playlist
 Dir=~/".webSound/"		## Path to program. Change if moved
 Local=$Dir"local/"
 Nhits=20			## Number of hits from youtube search
@@ -70,6 +70,7 @@ help=(""
 " SYNTAX: [First] (Second)"
 ""
 " [h]   →  This help"
+" [u]   →  Update ytdl"
 ""
 " [URL] →  Play [URL]"
 " [y]   →  Search youtube"
@@ -81,10 +82,11 @@ help=(""
 " [e]   →  Edit playlist"
 ""
 " [URL] (a)         → (a)dd [URL] to current playlist"
-" [SearchTerm] (p)  → (p)lay match from playlist"
-" [SearchTerm] (i)  → (i)nfo about matched search"
-" [SearchTerm] (w)  → (w)eb address of matched"
-" [SearchTerm] (k)  →  remove match from playlist"
+" [SearchTerm] (p)  → (p)lay [match] from playlist"
+" [SearchTerm] (v)  → (v)ideo [stream], v)480p V)1080p"
+" [SearchTerm] (i)  → (i)nfo about [matched search]"
+" [SearchTerm] (w)  → (w)eb address of [matched]"
+" [SearchTerm] (k)  →  remove [match] from playlist"
 " [ListName] (l)    →  choose playlist [ListName]"
 " [ListName] (L)    →  create playlist [ListName]"
 " [ListName] (K)    →  delete playlist [ListName]"
@@ -145,6 +147,7 @@ function Download() {  # << title link
     	#printf "\n|$title\n$Local$name\n" >> $Dir"llocal"
 	#state 1
 	
+  msg='Done'
 	title=$1
 	fname=`printf "$title\n" | sed 's/\ /_/g'`
 	printf " ${C[downloading]} $title\n ${C[to]} "$Dir"local/\n"
@@ -155,7 +158,7 @@ function Download() {  # << title link
   size2=` echo $size1 | cut -dM -f1 | sed 's/\.//g'`
   size2=$(( ( $size2*1024*1024 ) / 100 ))
   
-  youtube-dl -qf 140 $2 -o $Local$fname &
+  youtube-dl -qf 140 $2 -o $Local$fname --socket-timeout 60 &
   
   odd=1
   while [ ! -f $Local$fname* ]; do 
@@ -163,23 +166,38 @@ function Download() {  # << title link
     sleep 1
   done
   
+  old2=0
+  speed=0
+  sample=1
   while [ -f "$Local$fname.part" ]; do
     part1=` ls -oh $Local$fname* | grep .part | awk '{print $4}' `
     part2=` ls  -o $Local$fname* | grep .part | awk '{print $4}' `
     perc=$(( ($part2*100)/$size2 ))
-    printf "\r  $part1 / $size1 $perc%% "
-    fin=1
-    sleep 1 & (read -t 1 && wait ) || fin=0
-    (( $fin )) && break
+    #-
+    speed=$(( $speed + ( (part2-old2 ) - $speed ) /$sample ))
+    seconds=$(( ($size2-$part2)/$speed ))
+    old2=$part2
+    (( $sample < 20 )) && sample=$(($sample+1))
+    (( $odd )) && time=$(printf "%*s" 8 $(human_time $seconds)) && odd=0 || odd=1
+    #-
+
+    printf "\r  $part1/$size1  $perc%% $time"
+    
+    # Stop download by pressing Enter
+    fin=1; sleep 1 & (read -t 1 && wait ) || fin=0; (( $fin )) && msg='Interrupted' && break
     #sleep 1
+
   done
   pkill youtube-dl
-  [ -f $Local*.part ] && rm $Local*.part
+  #[ -f $Local*.part ] && rm $Local*.part
   
   [ -f $Local$fname ] &&
   printf "\n|$title\n$Local$fname\n$2\n" >> $Dir"llocal"
 	
-  printf "\r $cTeal$part1 / $size1  Done$fClear "
+  printf "\r $cTeal$part1 / $size1  $msg$fClear "
+  ([ $msg == "Interrupted" ] &&
+    read -p ' Save partly downloaded file? y/N: ' A && (
+      [[ -z $A ]] && [ -f $Local$fname.part ] && rm $Local$fname.part ) ) ||  
 	read -p " .."
 }
 
@@ -316,16 +334,17 @@ function scrape() {
 #
 function show() {
   Head "${C[youtube]}"
+  
   for ((n=0; n<N; n++)); do
     [[ $1 ]] && [[ n -eq $1 ]] && selection=$fBright || selection=$fClear  # Highlight selected
     printf "$selection%s:\t%s / %s\n" "$((n+1))" "${TI[$n]}" "${DU[$n]}"
   done
   echo
-  [[ -z $1 ]] && pick
+  [[ -z $1 ]] && Select
 }
 #
-function pick() {
-  read -ep "Select: " pik opt
+function Select() {
+  read -ep "`printf "Select: n\b"`" pik opt
   history -s "$pik"
   [[ -z "$pik" ]] && Search && return
   pik=$((pik-1))
@@ -525,14 +544,14 @@ function Local() {
     
   playlist=$_playlist
 	
-    # Select
+    # oldSelect
     
     #Head; main
   Head
 }
 
 
-#function Select() {
+#function oldSelect() {
 #	declare -A items
 #	count=1
 #	for i in `ls $Local`; do
@@ -803,7 +822,7 @@ function main() {
         w)  showLink "$U" ;;
 				#v)  video `readLink "$U"`  ;;
       v|V)  playVideo "$U" "$A" ;;
-        d)  Download `readTitle "$U"` `readLink "$U"` ;;
+        d)  Download "`readTitle $U`" "`readLink $U`" ;;
 				k)  removeElement "$U"; Head ;;
 				l)  goToList $U  ;;
 				L)	createList "$U" ;;
