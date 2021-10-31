@@ -1,8 +1,6 @@
-function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
 #!/bin/bash
 
-T=264030
-
+function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
 
 function human_time() {
   [[ -z $1 ]] && echo "Takes seconds" && return
@@ -34,10 +32,3 @@ function human_time() {
   echo $result
 
 }
-
-
-human_time $T
-
-# m=$(( $m + ((10*$S+9*($m/90))*$online-$m) / ($N) ))
-
-

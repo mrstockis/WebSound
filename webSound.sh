@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################################
-playlist="demo"		## Default playlist at start
+playlist="lofi"		## Default playlist at start
 _playlist=$playlist
 Dir=~/".webSound/"		## Path to program. Change if moved
 Local=$Dir"local/"
@@ -149,7 +149,7 @@ function Download() {  # << title link
 	
   msg='Done'
 	title=$1
-	fname=`printf "$title\n" | sed 's/\ /_/g'`
+	fname=`printf "$title\n" | sed 's/\ /_/g'`   ## Does \n result in ending extra _ ?
 	printf " ${C[downloading]} $title\n ${C[to]} "$Dir"local/\n"
 	#echo $fname
 	#  youtube-dl -qo $Local$fname -f bestaudio $2
@@ -166,22 +166,28 @@ function Download() {  # << title link
     sleep 1
   done
   
+  tput civis
+
   old2=0
   speed=0
   sample=1
   while [ -f "$Local$fname.part" ]; do
     part1=` ls -oh $Local$fname* | grep .part | awk '{print $4}' `
     part2=` ls  -o $Local$fname* | grep .part | awk '{print $4}' `
+    part1=${part1:-$size1}
+    part2=${part2:-$size2}
     perc=$(( ($part2*100)/$size2 ))
     #-
+    (( $sample == 1 )) && old2=$part2
     speed=$(( $speed + ( (part2-old2 ) - $speed ) /$sample ))
-    seconds=$(( ($size2-$part2)/$speed ))
+    seconds=$(( ($size2-$part2)/($speed+1) ))
     old2=$part2
     (( $sample < 20 )) && sample=$(($sample+1))
-    (( $odd )) && time=$(printf "%*s" 8 $(human_time $seconds)) && odd=0 || odd=1
+    (( $odd )) && time=$(printf "%*s" 10 $(human_time $seconds)) && odd=0 || odd=1
     #-
 
-    printf "\r  $part1/$size1  $perc%% $time"
+    printf "                                     "
+    printf "\r  $part1/$size1  $perc%% $time "
     
     # Stop download by pressing Enter
     fin=1; sleep 1 & (read -t 1 && wait ) || fin=0; (( $fin )) && msg='Interrupted' && break
@@ -194,6 +200,9 @@ function Download() {  # << title link
   [ -f $Local$fname ] &&
   printf "\n|$title\n$Local$fname\n$2\n" >> $Dir"llocal"
 	
+  tput cnorm
+
+  printf "                                      "
   printf "\r $cTeal$part1 / $size1  $msg$fClear "
   ([ $msg == "Interrupted" ] &&
     read -p ' Save partly downloaded file? y/N: ' A && (
