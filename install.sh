@@ -1,4 +1,5 @@
 #!/bin/bash
+
 clear
 
 printf "\n\033[1;34m First installation  or  Update ? \n f/u: "
@@ -14,6 +15,7 @@ if [[ $I ]]; then if [[ $I == "f" ]]; then
 	printf "\n|Long Tunes\nhttps://www.youtube.com/watch?v=fWRISvgAygU\n" >> ~/.webSound/demo
 	printf "\n|Radio Streams\nhttp://109.123.116.202:8010/stream\n" >> ~/.webSound/demo
 	cp webSound.sh ~/.webSound/
+  cp functs/ ~/.webSound/
 
 	printf "\n\033[1;34m Add alias: WebSound  to: ~/.bashrc  ? \n y/N: "
 	read A
@@ -34,6 +36,8 @@ if [[ $I ]]; then if [[ $I == "f" ]]; then
 elif [[ $I == "u" ]]; then
 	printf "\n\033[1;32m -- Update --\033[0m\n"
 	cp webSound.sh ~/.webSound/
+  cp functs/ ~/.webSound/
+
 	printf "\n Updated: webSound.sh\n"
 	printf "\n\033[1;34m Done\n\n\033[0m"
 
