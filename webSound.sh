@@ -150,7 +150,7 @@ function Download() {  # << title link
   msg='Done'
 	title=$1
 	fname=`printf "$title\n" | sed 's/\ /_/g'`   ## Does \n result in ending extra _ ?
-	printf " ${C[downloading]} $title\n ${C[to]} "$Dir"local/\n"
+	printf " ${C[downloading]} $title\n ${C[to]} $Local\n" #"$Dir"local/\n"
 	#echo $fname
 	#  youtube-dl -qo $Local$fname -f bestaudio $2
 	printf "$cYellow Preparing" #state 0
@@ -161,7 +161,7 @@ function Download() {  # << title link
   youtube-dl -qf 140 $2 -o $Local$fname --socket-timeout 60 &
   
   odd=1
-  while [ ! -f $Local$fname* ]; do 
+  while [ ! -f "$Local$fname"* ]; do 
     (( $odd )) && printf "." && odd=0 || odd=1
     sleep 1
   done
@@ -172,8 +172,8 @@ function Download() {  # << title link
   speed=0
   sample=1
   while [ -f "$Local$fname.part" ]; do
-    part1=` ls -oh $Local$fname* | grep .part | awk '{print $4}' `
-    part2=` ls  -o $Local$fname* | grep .part | awk '{print $4}' `
+    part1=` ls -oh "$Local$fname"* | grep .part | awk '{print $4}' `
+    part2=` ls  -o "$Local$fname"* | grep .part | awk '{print $4}' `
     part1=${part1:-$size1}
     part2=${part2:-$size2}
     perc=$(( ($part2*100)/$size2 ))
@@ -197,7 +197,7 @@ function Download() {  # << title link
   pkill youtube-dl
   #[ -f $Local*.part ] && rm $Local*.part
   
-  [ -f $Local$fname ] &&
+  [ -f "$Local$fname" ] &&
   printf "\n|$title\n$Local$fname\n$2\n" >> $Dir"llocal"
 	
   tput cnorm
