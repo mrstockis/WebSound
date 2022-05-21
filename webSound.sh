@@ -703,12 +703,15 @@ function getInfo() {
   title=`echo "$json" | jq .title | sed 's/"//g'`
   views=`echo "$json" | jq .view_count`
   views=`sci_num $views`
-  rating=`printf "%.1f" $(echo "$json" | jq .average_rating | awk '{print 100*$1/5+.5}')`
+  #rating=`printf "%.1f" $(echo "$json" | jq .average_rating | awk '{print 100*$1/5+.5}')`
   #rating=`printf "%.1f" $rating`
+  upload=`echo "$json" | jq .upload_date | sed 's/"//g'`
+  duration=`echo "$json" | jq .duration`
+  duration=`human_time $duration`
   disc=`echo "$json" | jq .description | sed 's/"//g'`
   clear
   printf "$cTeal $title$fClear\n$cYellow%s$fClear\n\n$disc\n" \
-    " Rating: $rating%  Views: $views" | less -R
+    " Upload: $upload  Views: $views  Duration: $duration" | less -R
 
   
   #link=$1
@@ -852,9 +855,10 @@ function Quit() {
 
 function SummonPlayer() {
   set -m
-	printf "$D @Player: "
+	printf "$D @Player: \r "; tput civis
   (sleep $1 && (( `ps -a | grep mpv | wc -l` )) && kill -s STOP `pgrep mpv` && kill -s CONT `pgrep mpv` &)
   fg >/dev/null
+  tput cnorm
 }
 
 function main() {
