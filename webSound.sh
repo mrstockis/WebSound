@@ -115,7 +115,7 @@ function Info() {
 }
 function Head() {
 	clear
-	[ -z "$1" ] && printf "${C[default]}" || printf "$1\n"
+  [ -z "$1" ] && printf "${C[default]}" || printf "$1\n"
 }
 
 play() {
@@ -643,7 +643,8 @@ function playSpecific() {
   #$player ` grep -E $expr -i $Dir$playlist -A 1 | grep -v "|" `
  
   #echo "$mode"
-  printf "`readTitle $1` \n"
+  #printf "`readTitle $1` \n"
+  readTitle $1
   #[ "$mode" = "p" ] && echo `readLink $1` || echo `readPath $1`
   if [ "$mode" = "p" ]; then 
     pkill mpv
@@ -652,11 +653,12 @@ function playSpecific() {
     pkill mpv
     $player --vid=no $(printf "`readPath "$1"`") & #< $pipe & # > /dev/null 2>&1 &
   fi
+  
+  #Head
 
   #[ "$mode" = "p" ] && printf "`readLink $1`" || printf "`readPath "$1"`"
   #read 
   
-  Head
     #if [ ! "`grep -i $1 $Dir$playlist | grep '|'`" ]; then
 	#	printf "${c[b]}`grep -i $1 $Dir$playlist`${c[E]}\n\n"
 	#	$player `grep -i $1 $Dir$playlist` 2>/dev/null
@@ -683,7 +685,15 @@ function playLink() {
 
 function readTitle() {
   expr='\|.*'$1
-  grep -E $expr -i $Dir$playlist | cut -d'|' -f2-
+  #grep -E $expr -i $Dir$playlist | cut -d'|' -f2-
+  ##
+  tput sc
+  n=2
+	while read title; do
+    tput cup $n 20; printf "$title"
+    n=$((n+1))
+  done <<< `grep -E $expr -i $Dir$playlist | cut -d'|' -f2-`
+  tput rc
 }
 
 function readLink() {
@@ -705,11 +715,19 @@ function getInfo() {
   views=`sci_num $views`
   #rating=`printf "%.1f" $(echo "$json" | jq .average_rating | awk '{print 100*$1/5+.5}')`
   #rating=`printf "%.1f" $rating`
-  upload=`echo "$json" | jq .upload_date | sed 's/"//g'`
+  _upload=`echo "$json" | jq .upload_date | sed 's/"//g'`
+  upload=""
+  for ((i=0;i<${#_upload};i++));do
+    upload=$upload${_upload:$i:1}
+    case $i in
+      3|5) upload=$upload"-" ;;
+    esac
+  done
   duration=`echo "$json" | jq .duration`
   duration=`human_time $duration`
   disc=`echo "$json" | jq .description | sed 's/"//g'`
-  clear
+  #clear
+  Head
   printf "$cTeal $title$fClear\n$cYellow%s$fClear\n\n$disc\n" \
     " Upload: $upload  Views: $views  Duration: $duration" | less -R
 
@@ -760,16 +778,31 @@ function createList() {
 
 
 function listLists() {
+  tput sc
+  tput cup 0 20
   printf "${c[b]} %-10s%*s${c[E]}\n" "Playlist" 4 "Items"
+  n=2
 	for i in `ls $Dir | egrep -iv 'functs|websound|local'`; do
-		printf " %-10s %*s\n" $i 4 `grep '|' -c $Dir$i`
+		tput cup $n 20
+    printf " %-10s %*s\n" $i 4 `grep '|' -c $Dir$i`
+    n=$((n+1))
 	done; echo
+  tput rc
 }
 
 
 function readList() {
-  [ "$1" = "r" ] && grep '|' $Dir$playlist | less || (Head && grep '|' $Dir$playlist )
-	#Head
+  #[ "$1" = "r" ] && grep '|' $Dir$playlist | less || (Head && grep '|' $Dir$playlist )
+  
+  if [ "$1" == "R" ]; then grep '|' $Dir$playlist | less; return; fi
+  n=2
+  tput sc
+	while read title; do
+    tput cup $n 20; printf "$title"
+    n=$((n+1))
+  done <<< `grep '|' $Dir$playlist`
+  tput rc
+  #Head
 }
 
 
@@ -834,7 +867,7 @@ function update() {
 
 
 function Help() {
-
+  clear
   for i in "${help[@]}"; do
 		printf "\033[1m$i${c[E]}\n"
 	done | less -r
@@ -846,19 +879,23 @@ function Help() {
 
 
 function Quit() {
+  tput civis
   Head "\033[2m${c[ws]}${c[E]}"
   sleep .5
   clear
+  tput cnorm
   exit
 }
 
 
 function SummonPlayer() {
   set -m
-	printf "$D @Player: \r "; tput civis
+  tput civis; tput sc
+	printf "$D ▶ Play/Pause:Space | Stop:Q | Seek:Arrows"
   (sleep $1 && (( `ps -a | grep mpv | wc -l` )) && kill -s STOP `pgrep mpv` && kill -s CONT `pgrep mpv` &)
   fg >/dev/null
-  tput cnorm
+  tput rc;
+  printf "                                             \r"; tput cnorm
 }
 
 function main() {
@@ -869,11 +906,11 @@ function main() {
     playlist=`ls "$Dir" | egrep -v 'functs|local|webSound' | head -n1`
 	
   Info
-
-	read -rep "> " U A
+	
+  read -rep "> " U A
 	history -s "$U"
 	
-	Head
+  Head
 	if [ $U ]; then #Head
 
 		if [ ! $A ]; then
@@ -882,9 +919,9 @@ function main() {
         q)  Quit  ;;
 			y|s)	Search $U ;;
 				d)	Local ;;
-				p) SummonPlayer 5 ;;
-			r|R)	readList $U ;;
-				l)	listLists  ;;
+				p)  SummonPlayer 5 ;;
+			r|R)	tput civis; readList $U; tput cnorm ;;
+				l)	tput civis;  listLists ; tput cnorm  ;;
 				e)	$editor $Dir$playlist  ;;
         u)  update ;;
 				*)	playSpecific "$U" ;;
@@ -922,16 +959,30 @@ function main() {
 }
 
 # Start
-
+v=1
 clear
-printf "${c[D]}${c[ws]}${c[E]}${c[b]} "
-for l in ${c[ws]}; do
-  printf "\b\b" #; sleep 0.5
-done
-for l in ${c[ws]}; do
-  printf "$l "; sleep 0.05
-done
-sleep 0.5
+tput civis
+if [[ $v = 0 ]]; then
+  printf "${c[D]}${c[ws]}${c[E]}${c[b]} "
+  for l in ${c[ws]}; do
+    printf "\b\b" #; sleep 0.5
+  done
+  for l in ${c[ws]}; do
+    printf "$l "; sleep 0.05
+  done
+  sleep 0.5
+else
+  for l in ${c[ws]}; do
+    tput blink; printf " \033[34m$l\033[0m"; sleep .05
+  done
+  sleep 1
+  tput cup 0 0; printf "\033[34m w e b s o u n d\033[0m"; sleep .5
+fi
+echo;echo
+sleep .1 && tput cnorm &
 
-Home; main
+
+
+#Home; 
+main
 
