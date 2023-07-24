@@ -115,6 +115,7 @@ function Info() {
 }
 function Head() {
 	clear
+	echo -e "${c[y]}Changes made for grep. Remember to test and push update${c[E]}"; echo
   [ -z "$1" ] && printf "${C[default]}" || printf "$1\n"
 }
 
@@ -376,7 +377,7 @@ function Select() {
     v|vl)
       printf "$fDark Video stream .. $fClear" #: s ..\n" "${TI[$pik]}
       #pkill mpv
-      $player "${LI[$pik]}" --really-quiet --ytdl-format=$quality_lo #&
+      $player "${LI[$pik]}" --really-quiet --ytdl-format=$quality_lo -vo=tct #&
       ;;
       #show ;;
     V|vh)
@@ -414,7 +415,7 @@ playVideo() {
     v|vl)
       printf "$fDark Video stream .. $fClear" #: s ..\n" "${TI[$pik]}
       pkill mpv
-      $player `readLink $1` --really-quiet --ytdl-format=$quality_lo ;;# & jid=`echo $!` ;;
+      $player `readLink $1` --really-quiet --ytdl-format=$quality_lo --vo=tct ;;# & jid=`echo $!` ;;
       #show ;;
     V|vh)
       printf "$fDark Video stream .. $fClear" #: s ..\n" "${TI[$pik]}
@@ -451,7 +452,7 @@ hits=`echo "$dump" |
 	`
 
 #echo
-lhits=`echo "$hits" | cut -d ' ' -f2- | grep -nE '.' `
+lhits=`echo "$hits" | cut -d ' ' -f2- | grep -nP '.' `
 #echo "$lhits"
 #echo
 
@@ -539,7 +540,7 @@ function Local() {
             v)
               printf "$fDark Video stream .. $fClear"
               #pkill mpv
-              $player `readLink "$U"` --really-quiet --ytdl-format=$quality_lo #&
+              $player `readLink "$U"` --really-quiet --ytdl-format=$quality_lo --vo=tct #&
               ;;
             V)
               printf "$fDark Video stream .. $fClear"
@@ -639,8 +640,8 @@ function getJid() {
 function playSpecific() {
   #expr='\|.*'$1
   #history -s "$1"
-  #printf "` grep -E $expr -i $Dir$playlist `" | grep "|"
-  #$player ` grep -E $expr -i $Dir$playlist -A 1 | grep -v "|" `
+  #printf "` grep -P $expr -i $Dir$playlist `" | grep "|"
+  #$player ` grep -P $expr -i $Dir$playlist -A 1 | grep -v "|" `
  
   #echo "$mode"
   #printf "`readTitle $1` \n"
@@ -685,25 +686,25 @@ function playLink() {
 
 function readTitle() {
   expr='\|.*'$1
-  #grep -E $expr -i $Dir$playlist | cut -d'|' -f2-
+  #grep -P $expr -i $Dir$playlist | cut -d'|' -f2-
   ##
   tput sc
   n=2
 	while read title; do
     tput cup $n 20; printf "$title"
     n=$((n+1))
-  done <<< `grep -E $expr -i $Dir$playlist | cut -d'|' -f2-`
+  done <<< `grep -P $expr -i $Dir$playlist | cut -d'|' -f2-`
   tput rc
 }
 
 function readLink() {
   expr='\|.*'$1
-  grep -E $expr -i $Dir$playlist -A 2 | egrep "^[^|]" | egrep -v "$Local"
+  grep -P $expr -i $Dir$playlist -A 2 | egrep "^[^|]" | egrep -v "$Local"
 }
 
 function readPath() {
   expr='\|.*'$1
-  grep -E $expr -i $Dir$playlist -A 2 | egrep "^[^|]" | grep "$Local"
+  grep -P $expr -i $Dir$playlist -A 2 | egrep "^[^|]" | grep "$Local"
 }
 
 
@@ -830,7 +831,7 @@ function removeList() {
 
 function removeElement() {
     
-    hits=`grep -Ei '\|.*'$1 $Dir$playlist`
+    hits=`grep -Pi '\|.*'$1 $Dir$playlist`
     echo "$hits"
     echo
     read -rep "Delete? y/N : " D
@@ -838,11 +839,11 @@ function removeElement() {
     if [ "$D" != "y" ]; then return; fi    
     
     if [ $playlist == "llocal" ]; then
-        rm $Local"`ls $Local | grep -Ei $1`"
+        rm $Local"`ls $Local | grep -Pi $1`"
     fi
     
-    tmpList=`grep -v "$(grep -A1 "$hits" $Dir$playlist | grep -v '|')" $Dir$playlist`
-    echo "$tmpList" | grep -v "$hits" > $Dir$playlist
+    tmpList=`grep -iv "$(grep -A1 "$hits" $Dir$playlist | grep -v '|')" $Dir$playlist`
+    echo "$tmpList" | grep -iv "$hits" > $Dir$playlist
 
 }
 
