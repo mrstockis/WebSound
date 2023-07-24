@@ -115,7 +115,7 @@ function Info() {
 }
 function Head() {
 	clear
-	echo -e "${c[y]}Changes made for grep. Remember to test and push update${c[E]}"; echo
+	#echo -e "${c[y]}Changes made for grep. Remember to test and push update${c[E]}"; echo
   [ -z "$1" ] && printf "${C[default]}" || printf "$1\n"
 }
 
