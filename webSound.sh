@@ -7,7 +7,7 @@ Local=$Dir"local/"
 Nhits=20			## Number of hits from youtube search
 editor="nano"  ## Change to prefered editor
 player="mpv --really-quiet" # --load-unsafe-playlists"	##LUP-flag fixes mpv refusing playback of playlist
-quality_lo='bestvideo[height<=?480][fps<=?30][vcodec!=?vp9]+bestaudio'
+quality_lo='18' #'bestvideo[height<=?480][fps<=?30][vcodec!=?vp9]+bestaudio'
 quality_hi='bestvideo[height<=?1080][fps<=?30][vcodec!=?vp9]+bestaudio'
 mode="p"
 #player="omxplayer -o local --vol -900"
@@ -340,10 +340,10 @@ function Search() {
 function scrape() {
   page=` w3m -dump -o display_link_number=1 "google.com/search?q=youtube+%2B+$1" `  # "https://www.google.com/search?q=youtube+%2B+$1" `
   N=0
-  for nr in ` printf "%s\n" "$page" | grep YouTube | fgrep "[" | cut -d] -f1 `; do
-    ti=` printf '%s\n' "$page" | fgrep "$nr" | head -n1 | cut -d']' -f2- | awk -F'- YouTube' '{print $1}' `
-    du=` printf '%s\n' "$page" | fgrep "$nr" -A5 | grep Duration `
-    li=` printf '%s\n' "$page" | fgrep "$nr" | tail -n1 | cut -d] -f2- | cut -d= -f2- | cut -d'&' -f1 `
+  for nr in ` printf "%s\n" "$page" | grep YouTube | grep -F "[" | cut -d] -f1 `; do
+    ti=` printf '%s\n' "$page" | grep -F "$nr" | head -n1 | cut -d']' -f2- | awk -F'- YouTube' '{print $1}' `
+    du=` printf '%s\n' "$page" | grep -F "$nr" -A5 | grep Duration `
+    li=` printf '%s\n' "$page" | grep -F "$nr" | tail -n1 | cut -d] -f2- | cut -d= -f2- | cut -d'&' -f1 `
     TI[$N]="$ti"
     DU[$N]="$du"
     LI[$N]="$( urldecode $li )"
@@ -664,7 +664,7 @@ function playSpecific() {
 	#	printf "${c[b]}`grep -i $1 $Dir$playlist`${c[E]}\n\n"
 	#	$player `grep -i $1 $Dir$playlist` 2>/dev/null
 	#else
-	#	f=(); f+=(`grep -iA 1 $1 $Dir$playlist | egrep -v '\|'`)
+	#	f=(); f+=(`grep -iA 1 $1 $Dir$playlist | grep -P -v '\|'`)
 	#	printf "${c[b]}`grep -i $1 $Dir$playlist`${c[E]}\n\n"
 	#	$player ${f[@]} 2>/dev/null
 	#fi
@@ -699,12 +699,12 @@ function readTitle() {
 
 function readLink() {
   expr='\|.*'$1
-  grep -P $expr -i $Dir$playlist -A 2 | egrep "^[^|]" | egrep -v "$Local"
+  grep -P $expr -i $Dir$playlist -A 2 | grep -P "^[^|]" | grep -P -v "$Local"
 }
 
 function readPath() {
   expr='\|.*'$1
-  grep -P $expr -i $Dir$playlist -A 2 | egrep "^[^|]" | grep "$Local"
+  grep -P $expr -i $Dir$playlist -A 2 | grep -P "^[^|]" | grep "$Local"
 }
 
 
@@ -783,7 +783,7 @@ function listLists() {
   tput cup 0 20
   printf "${c[b]} %-10s%*s${c[E]}\n" "Playlist" 4 "Items"
   n=2
-	for i in `ls $Dir | egrep -iv 'functs|websound|local'`; do
+	for i in `ls $Dir | grep -P -iv 'functs|websound|local'`; do
 		tput cup $n 20
     printf " %-10s %*s\n" $i 4 `grep '|' -c $Dir$i`
     n=$((n+1))
@@ -808,7 +808,7 @@ function readList() {
 
 
 function goToList() {
-	new=` ls $Dir | egrep -iv 'websound|local' | grep -iE $1 | head -n 1 `
+	new=` ls $Dir | grep -P -iv 'websound|local' | grep -iE $1 | head -n 1 `
 	[ $new ] && playlist=$new || printf "$cError No matching playlist $fClear\n"
 }
 
@@ -903,8 +903,8 @@ function main() {
 	dbq=`date +%s`  # double quit
 	while true; do
   
-  [[ -z `ls "$Dir" | egrep "^$playlist$"` ]] && 
-    playlist=`ls "$Dir" | egrep -v 'functs|local|webSound' | head -n1`
+  [[ -z `ls "$Dir" | grep -P "^$playlist$"` ]] && 
+    playlist=`ls "$Dir" | grep -P -v 'functs|local|webSound' | head -n1`
 	
   Info
 	
